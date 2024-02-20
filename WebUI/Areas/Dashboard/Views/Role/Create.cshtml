@@ -1,0 +1,11 @@
+﻿@model Microsoft.AspNetCore.Identity.IdentityRole
+<form method="post">
+    <div class="form-group">
+        <label asp-for="Name"></label>
+        <input type="text" value="" asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name"></span>
+
+    </div>
+
+    <input type="submit" value="Success" class="btn btn-success" />
+</form>

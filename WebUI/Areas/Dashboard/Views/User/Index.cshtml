@@ -1,5 +1,78 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
+﻿@model List<User>
+@inject Microsoft.AspNetCore.Identity.UserManager<User> _UserManager
+
+<table id="example" class="display" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Roles</th>
+                    <th>Email</th>
+                    <th>RoleActions</th>
+                  
+                </tr>
+            </thead>
+            <tbody>
+
+                @foreach (var user in Model)
+                {
+                    <tr>
+                        <td>
+                            @user.LastName @user.FirstName
+                        </td>
+                        <td>
+                            @{
+                                var roles = await _UserManager.GetRolesAsync(user);
+
+                                foreach (var item in roles)
+                                {
+                                                                                        <p>@item; </p>
+                                }
+                            }
+                        </td>
+                        <td>  @user.Email </td>
+                        <td>
+                         
+                            <!-- Delet User Info Modal-->
+                    <button  onclick='Userdlt("@user.Id","@user.UserName")' class="btn btn-danger">Delete</button>
+                            <a class="btn btn-warning mx-3" asp-area="dashboard" asp-controller="User" asp-action="Addrole" asp-route-userId="@user.Id">AddRole</a>
+                        </td>
+
+
+                       
+
+
+                    </tr>
+                }
+            </tbody>
+
+        </table>
+
+    <script>
+    new DataTable('#example');
+
+        function Userdlt(id,username){
+          if    (  window.confirm(`${username} silmek isteyirsinizmi?`)){
+            $.ajax({
+                url: `/dashboard/user/DeleteUser?userId=${id}`,
+                method: 'get',
+    datatype:"Json",
+                success: function (data) {
+                    console.log("Isledi", data)
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+          }
+    const table = document.getElementById("example");
+   
+   
+        }
+        function modalClose() {
+
+        }
+    </script>
+    
+
+
+

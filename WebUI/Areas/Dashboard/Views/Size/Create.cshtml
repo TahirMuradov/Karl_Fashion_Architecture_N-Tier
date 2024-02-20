@@ -1,0 +1,12 @@
+﻿@using Entities.DTOs.SizeDTOs
+@model AddSizeDTO
+
+<form method="post">
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <div class="form-group">
+        <label asp-for=Size for="size" class="col-form-label"></label>
+        <input asp-for=Size type="text" value="" name="size" class="form-control"  />
+        <span asp-validation-for="Size" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-outline-success">Save</button>
+</form>

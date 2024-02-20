@@ -11,10 +11,10 @@ namespace Entities
     {
         public Guid Id { get; set; }    
         public DateTime CreatedDate { get; set; }
-        public string CreatorUserId { get; set; }
+        public string UserId { get; set; }
         public User User { get; set; }
         public DateTime? UpdatedDate { get; set;}
-        public string UpdatedUserId { get; set; }
+        public string? UpdatedUserId { get; set; }
       
         
     }

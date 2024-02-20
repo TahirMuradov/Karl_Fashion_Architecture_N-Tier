@@ -1,0 +1,203 @@
+﻿
+@model List<CartDetailDTO>
+
+
+
+
+@{
+    decimal cartTotal = 0;
+    GetShippingMethodDTO currentShipping = ViewBag.CurrentShippingMethods as GetShippingMethodDTO; ;
+     
+    if (ViewBag.CurrentShippingMethods is not null)
+    {
+        cartTotal += currentShipping.Price;
+    }
+}
+@if (Model.Count!=0)
+{
+    
+<!-- ****** Cart Area Start ****** -->
+
+<div class="container">
+
+        <div class="text-danger" asp-validation-summary="All"></div>
+
+    <div class="alert alert-warning">
+        <strong>Məlumat!</strong>Əgər Məhsulun Sayini Artirmaq Mumkun deyilse Stockda olan sayi kecir!
+    </div>
+</div>
+<div class="cart_area section_padding_100 clearfix">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="cart-table clearfix">
+                    <table class="table table-responsive">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Price</th>
+                                    <th>Size</th>
+                                    <th>Color</th>
+                                <th>Quantity</th>
+                                <th>Total</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+               
+                                
+                            @foreach(var item in Model){
+                                 decimal totalPrice = 0;
+                                 totalPrice = item.Price * item.NeededQuantity;
+                                    cartTotal += totalPrice;
+
+                            <tr>
+                                <td class="cart_product_img d-flex align-items-center">
+                                    <a href="#"><img src="@item.PictureUrl" alt="Product"></a>
+                                    <h6>@item.ProductName</h6>
+                                </td>
+                                    <td class="price"><span>@item.Price &#x20BC</span></td>
+                                        <td>@item.Size</td>
+                                        <td> <span style="background-color:@item.Color;" class="btn"></span> </td>
+                                <td class="qty">
+                                    <div class="quantity">
+                                                <span class="qty-minus" onclick="var effect = document.getElementById('qty_@item.Id-@item.Size'); var qty = effect.value; if( !isNaN( qty ) &amp;&amp; qty &gt; 1 ) effect.value--;return false;"><i class="fa fa-minus" aria-hidden="true"></i></span>
+                                        <input disabled="disabled"  type="number" class="qty-text" id="qty_@item.Id-@item.Size" step="1" min="1" max="@item.MaxQuantity" name="quantity" value="@item.NeededQuantity">
+                                                <input type="hidden" value="@item.Id" name="Id" />
+                                                <input type="hidden" value="@item.Size" name="Size" />
+                                        <span class="qty-plus" onclick="var effect = document.getElementById('qty_@item.Id-@item.Size'); var qty = effect.value; if( !isNaN( qty ) && effect.getAttribute('max')>qty) effect.value++;return false;"><i class="fa fa-plus" aria-hidden="true"></i></span>
+                                    </div>
+                                </td>
+                                    <td class="total_price"><span>@totalPrice &#x20BC</span></td>
+                                    <td class="action"> <a class="btn btn-outline-danger" asp-controller="cart" asp-action="cartdeleteitem" asp-route-Id="@item.Id" asp-route-size="@item.Size"><i class="fa-solid fa-trash"></i></a></td>
+                            </tr>
+                                }
+                          
+
+
+
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="cart-footer d-flex mt-30">
+                    <div class="back-to-shop w-50">
+                        <a href="shop/index" href="shop-grid-left-sidebar.html">Continue shooping</a>
+                    </div>
+                    <div class="update-checkout w-50 text-right">
+                            <a class="btn-outline-danger" href="/cart/ClearCart">clear cart</a>
+                            <a class="update-cart-btn" href="#">Update cart</a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+    @*         <div class="col-12 col-md-6 col-lg-4">
+                <div class="coupon-code-area mt-70">
+                    <div class="cart-page-heading">
+                        <h5>Cupon code</h5>
+                        <p>Enter your cupone code</p>
+                    </div>
+                    <form action="#">
+                        <input type="search" name="search" placeholder="#569ab15">
+                        <button type="submit">Apply</button>
+                    </form>
+                </div>
+            </div> *@
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="shipping-method-area mt-70">
+                    <div class="cart-page-heading">
+                        <h5>Shipping method</h5>
+                        <p>Select the one you want</p>
+                            <div class="alert alert-info">
+                                <strong>Info!</strong> Standart Catirilma ile mehsul 1hefte içində catirilir!
+                            </div>
+                    </div>
+                        @if (ViewBag.CurrentShippingMethods is not null)
+                        {
+                            var curretnShippingMethod=ViewBag.CurrentShippingMethods as GetShippingMethodDTO;
+                            @foreach (var shippingMethod in ViewBag.ShippingMethods as List<GetShippingMethodDTO>)
+                            {
+                                if (curretnShippingMethod.Id==shippingMethod.Id.ToLower())
+                                {
+                                    <div class="custom-control custom-radio mb-30">
+                                        <input type="radio" id="@shippingMethod.Id" name="shippingMethod" class="custom-control-input" value="@shippingMethod.Id" checked>
+                                        <label class="custom-control-label d-flex align-items-center justify-content-between" for="@shippingMethod.Id"><span>@shippingMethod.Content</span><span>@shippingMethod.Price &#x20BC</span></label>
+                                    </div>
+                                }
+                                else
+                                {
+                                    
+                                <div class="custom-control custom-radio mb-30">
+                                        <input type="radio" id="@shippingMethod.Id" name="shippingMethod" class="custom-control-input" value="@shippingMethod.Id">
+                                    <label class="custom-control-label d-flex align-items-center justify-content-between" for="@shippingMethod.Id"><span>@shippingMethod.Content</span><span>@shippingMethod.Price &#x20BC</span></label>
+                                    </div>
+                                }
+                            }
+                        }
+                        else
+                        {
+                            
+                        @foreach (var shippingMethod in ViewBag.ShippingMethods as List<GetShippingMethodDTO>)
+                        {
+                            
+                    <div class="custom-control custom-radio mb-30">
+                            <input  type="radio" id="@shippingMethod.Id" name="shippingMethod" class="custom-control-input" value="@shippingMethod.Id">
+                                <label class="custom-control-label d-flex align-items-center justify-content-between" for="@shippingMethod.Id"><span>@shippingMethod.Content</span><span>@shippingMethod.Price &#x20BC</span></label>
+                    </div>
+                        }
+                        }
+
+               
+                    
+                </div>
+            </div>
+            <div class="col-12 col-lg-4">
+                <div class="cart-total-area mt-70">
+                    <div class="cart-page-heading">
+                        <h5>Cart total</h5>
+                        <p>Final info</p>
+                    </div>
+
+                    <ul class="cart-total-chart">
+
+                            <li><span><strong>Çatdırılma</strong></span> <span><strong id="deliveryPrice">
+                                
+                                        @{
+                                            if(currentShipping is not null)
+                                            {
+                                              <span> 
+                                              @currentShipping.Price
+                                              </span>   
+                                            }
+                                           
+
+                                   
+                                    @Html.Raw("&#x20BC")}
+                                    
+                                   </strong></span></li>
+                            <li><span><strong>Cəmi</strong></span> <span><strong id="cartTotalPrice">@cartTotal &#x20BC</strong></span></li>
+                    </ul>
+                    <a href="checkout/index" class="btn karl-checkout-btn">Proceed to checkout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ****** Cart Area End ****** -->
+}
+else
+{
+    <div class="alert alert-info">
+        <strong>Info!</strong>Səbətinizde Məhsul Yoxdur
+    </div>
+}
+
+@section scripts {
+    <script>
+      
+    </script>
+}

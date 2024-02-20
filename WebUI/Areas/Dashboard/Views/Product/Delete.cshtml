@@ -1,0 +1,11 @@
+﻿@model ProductRemoveDTO
+<form method="post">  
+    <div asp-validation-summary="All"></div>
+    <input type="hidden" value="@Model.ProductName" asp-for="ProductName" />
+    <input type="hidden" value="@Model.ProductId" asp-for="ProductId" />
+    <div class="alert alert-danger">
+        <strong>@Model.ProductName!</strong> Mehsulu Silmek Isteyirsinizmi?
+    </div>
+    <button type="submit" class="btn btn-danger">Yes</button>
+    <a asp-action="index" class="btn btn-success">No</a>
+</form>

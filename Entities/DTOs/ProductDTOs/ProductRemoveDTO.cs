@@ -9,5 +9,6 @@ namespace Entities.DTOs.ProductDTOs
     public class ProductRemoveDTO
     {
         public Guid ProductId { get; set; }
+        public string ProductName { get; set; }
     }
 }

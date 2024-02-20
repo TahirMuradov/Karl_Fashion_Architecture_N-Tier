@@ -1,0 +1,90 @@
+﻿
+@model List<SizeGetAdminDetailDTO?>
+<div class="m-3">
+    <a asp-action="Create" class="btn btn-outline-success">Create</a>
+</div>
+<table id="example" class="display" style="width:100%">
+    <thead>
+        <tr>
+
+            <th>Productname</th>
+            <td>Size</td>
+            <td>Stock Size Count</td>
+
+            <th>Actions</th>
+
+        </tr>
+
+    </thead>
+    <tbody id="parent">
+     @foreach (var size in Model)
+        {
+            <tr id="@size.SizeId">
+                <td>@size.Size</td>
+                <td >
+                 @for (int i = 0; i < size.ProductName.Count; i++)
+                    {
+                        <p>@size.ProductName[i]</p>
+                        if (i<size.ProductName.Count-1)
+                        {
+                            @Html.Raw(", ")
+                        }
+                    }
+                    
+                  
+                    </td>
+                <td>@size.StockSizeCount</td>
+                <td>
+                     <a asp-action="delete" asp-route-SizeId="@size.SizeId" class="btn btn-outline-danger">Delete</a> 
+                    <a asp-action="Update" asp-route-SizeId="@size.SizeId" class="btn btn-outline-warning">Edit</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+
+    <tfoot>
+        <tr>
+
+            <th>Productname</th>
+            <td>Size</td>
+            <td>Stock Size Count</td>
+
+            <th>Actions</th>
+
+        </tr>
+
+    </tfoot>
+</table>
+@section scripts{
+
+<script>
+    new DataTable('#example');
+        // function SizeDelet(sizeId, size) {
+
+        //     if (confirm(`${size} Olcu Silinsinmi?`)) {
+
+        //         debugger;
+        //         var datas = new FormData();
+        //         datas.append("SizeId", sizeId)
+        //         $.ajax({
+        //             url: "/dashboard/size/Delete",
+        //             type: "POST",
+        //             dataType: "json",
+        //             data: datas,
+        //             contentType: false,
+        //             processData: false,
+        //             success: function (e) {
+        //                 $('#parent').children(`#${sizeId}`).remove();
+        //                 console.log(e);
+        //             },
+        //             error: function (e) {
+        //                 console.log(e)
+        //             }
+        //         });
+
+        //     }
+
+
+        // }
+</script>
+} 

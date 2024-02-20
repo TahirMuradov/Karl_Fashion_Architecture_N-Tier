@@ -1,4 +1,9 @@
-﻿using Core.DataAccess.EntityFramework;
+﻿using AutoMapper;
+using Core.DataAccess.EntityFramework;
+using Core.Utilities.Results.Abstract;
+using Core.Utilities.Results.Concrete;
+using Core.Utilities.Results.Concrete.ErrorResults;
+using Core.Utilities.Results.Concrete.SuccessResults;
 using DataAccess.Abstract;
 using DataAccess.Concrete.SQLserver;
 using Entities;
@@ -6,29 +11,33 @@ using Entities.Concrete;
 using Entities.DTOs.CategoryDTOs;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Immutable;
+using System.Linq.Expressions;
 
 namespace DataAccess.Concrete
 {
     public class EFCategoryDAL : EFRepositoryBase<Category, AppDbContext>, ICategoryDAL
     {
         private readonly UserManager<User> _userManager;
-        
-        public EFCategoryDAL(UserManager<User> userManager)
+        private readonly IMapper _mapp;
+
+
+        public EFCategoryDAL(UserManager<User> userManager, IMapper mapper, IMapper mapp)
         {
             _userManager = userManager;
+            _mapp = mapp;
         }
 
-        public bool AddCategory(CategoryAddDTO categoryAddDTO)
+        public IResult AddCategory(CategoryAddDTO categoryAddDTO)
         {
             try
             {
                 using var context = new AppDbContext();
-           var currentUser=_userManager.Users.FirstOrDefault(x=>x.Id==categoryAddDTO.CreatorUserId);
+                var creatotUser = _userManager.Users.FirstOrDefault(x => x.Id == categoryAddDTO.CreatorUserId);
+
                 Category category = new Category()
                 {
-                    CreatorUserId=categoryAddDTO.CreatorUserId,
-                    User=currentUser,
+
+                    User = creatotUser,
                     CreatedDate = DateTime.Now,
                 };
 
@@ -53,28 +62,31 @@ namespace DataAccess.Concrete
                 }
                 context.SaveChanges();
 
-                return true;
+                return new Result(true, "Category Elave Olundu");
             }
             catch (Exception)
             {
 
-                return false;
+                return new Result(false, "Category Elave edilmedi");
             }
 
         }
 
-        public async Task<bool> AddCategoryAsync(CategoryAddDTO categoryAddDTO)
+        public async Task<IResult> AddCategoryAsync(CategoryAddDTO categoryAddDTO)
         {
             try
             {
+                var creatotUser = await _userManager.FindByIdAsync(categoryAddDTO.CreatorUserId);
                 using var context = new AppDbContext();
                 Category category = new Category()
                 {
+
+                    UserId = creatotUser.Id,
                     CreatedDate = DateTime.Now,
                 };
 
                 await context.Categories.AddAsync(category);
-                await context.SaveChangesAsync();
+
 
                 for (int i = 0; i < categoryAddDTO.LangCode.Count; i++)
                 {
@@ -84,7 +96,8 @@ namespace DataAccess.Concrete
                         CategoryName = categoryAddDTO.CategoryName[i],
                         LangCode = categoryAddDTO.LangCode[i],
                         CategoryId = category.Id,
-                        Category = category
+                        Category = category,
+
 
 
                     };
@@ -94,120 +107,200 @@ namespace DataAccess.Concrete
                 }
                 await context.SaveChangesAsync();
 
-                return true;
+                return new Result(true, "Category Elave Olundu");
             }
             catch (Exception)
             {
 
-                return false;
+                return new Result(false, "Category Elave edilmedi");
             }
         }
 
-        public bool DeleteCategory(CategoryRemoveDTO categgoryDeleteDTO)
+        public IResult DeleteCategory(CategoryRemoveDTO categgoryDeleteDTO)
         {
 
             try
             {
                 using var context = new AppDbContext();
                 //var category = context.Categories.FirstOrDefault(x => x.Id == categgoryDeleteDTO.CategoryId);
-                var categoryLanguages = context.CategoryLanguages
-                    .Where(x => x.CategoryId == categgoryDeleteDTO.CategoryId)
-                    .Include(x => x.Category).ToList();
-                context.RemoveRange(categoryLanguages);
+                var category = context.Categories.
+                    Include(x => x.CategoryLanguages)
+                    .Include(x => x.CategoryProducts)
+                        .ThenInclude(x => x.Product)
+                            .ThenInclude(x => x.productLanguages).ToList();
+
+                context.RemoveRange(category);
                 context.SaveChanges();
 
-                return true;
+                return new Result(true, "Category  Silindi");
 
             }
             catch (Exception)
             {
 
-                return false;
+                return new Result(false, "Category Silinmedi");
             }
         }
 
-        public async Task<bool> DeleteCategoryAsync(CategoryRemoveDTO categgoryDeleteDTO)
+        public async Task<IResult> DeleteCategoryAsync(CategoryRemoveDTO categgoryDeleteDTO)
         {
             try
             {
                 using var context = new AppDbContext();
                 //var category = context.Categories.FirstOrDefault(x => x.Id == categgoryDeleteDTO.CategoryId);
-                var categoryLanguages = context.CategoryLanguages
-                    .Where(x => x.CategoryId == categgoryDeleteDTO.CategoryId)
-                    .Include(x => x.Category).ToList();
-                context.RemoveRange(categoryLanguages);
-             await   context.SaveChangesAsync();
+                var category = context.Categories.
+                    Include(x => x.CategoryLanguages)
+                        .Include(x => x.User)
+                    .Include(x => x.CategoryProducts).ThenInclude(x => x.Product).ThenInclude(a => a.productLanguages)
+                    .ToList();
+                context.RemoveRange(category);
+                await context.SaveChangesAsync();
 
-                return true;
+
+                return new Result(true, "Category  Silindi");
+
 
             }
             catch (Exception)
             {
 
-                return false;
+                return new Result(false, "Category Silinmedi");
             }
 
         }
 
-        public List<Category> GetAllCategories(CategoryGetDTO categoryGetDTO)
+        public async Task<IDataResult<List<CategoryGetAdminListDTO>>> GetCategoriesAsync(Expression<Func<Category, bool>> expression = null)
         {
-            throw new NotImplementedException();
+
+            using var context = new AppDbContext();
+
+            var query = expression == null ? context.Categories
+                .Include(x => x.CategoryLanguages)
+               .Include(x => x.User)
+                .Include(x => x.CategoryProducts).ThenInclude(a => a.Product).ThenInclude(a => a.productLanguages)
+
+
+                .ToList() :
+                    context.Categories.Include(x => x.CategoryProducts).ThenInclude(a => a.Product).ThenInclude(a => a.productLanguages)
+                .Include(x => x.User)
+                 .Include(x => x.CategoryLanguages)
+                 .ToList();
+
+
+
+
+
+            var resultMaped = query.Select(categoryLanguage => new CategoryGetAdminListDTO
+            {
+                id = categoryLanguage.Id.ToString(),
+                CategoryName = categoryLanguage.CategoryLanguages.Select(x => x.CategoryName).ToList(),
+                LaunguageCode = categoryLanguage.CategoryLanguages.Select(x => x.LangCode).ToList(),
+                CreatedDate = categoryLanguage.CreatedDate,
+                UpdatedDate = categoryLanguage.UpdatedDate,
+                UpdatedUserId = categoryLanguage.UpdatedUserId,
+                UserName = categoryLanguage.User.UserName,
+                IsFeatured = categoryLanguage.IsFeatured,
+            }).ToList();
+            return new SuccessDataResult<List<CategoryGetAdminListDTO>>(resultMaped);
+
+
+
         }
 
-        public bool UpdateCategory(CategoryUpdateDTO categoryUpdateDTO)
+        public IDataResult<List<CategoryGetDTO>> GetCategoryName(string langCode)
         {
             try
             {
-                using var context = new AppDbContext();
-             for (int i = 0;i<categoryUpdateDTO.LanguageCode.Count;i++)
+                var context = new AppDbContext();
+              
+             List<CategoryGetDTO> categories=new List<CategoryGetDTO>();
+            var category=    context.CategoryLanguages.Where(x => x.LangCode == langCode)
+                    .Include(x=>x.Category)
+                    
+                    
+                    .ToList();
+                foreach (var categoryName in category)
                 {
-                    var categoryLanguages = context.CategoryLanguages
-                        .FirstOrDefault(x => x.CategoryId == categoryUpdateDTO.CategoryId && x.LangCode == categoryUpdateDTO.LanguageCode[i]);
-                    if (categoryLanguages!=null)
+                    categories.Add(new CategoryGetDTO
                     {
-                        categoryLanguages.CategoryName= categoryUpdateDTO.LanguageCode[i];
-                        context.Update(categoryLanguages);
-                    }
+                        CategoryId = categoryName.Category.Id.ToString(),
+                        CategoryName = categoryName.CategoryName
+
+                    });
+
                 }
 
-             context.SaveChanges();
-
-                return true;
-
+                return new SuccessDataResult<List<CategoryGetDTO>>(categories);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
 
-                return false;
+                return new ErrorDataResult<List<CategoryGetDTO>>(ex.Message);
             }
+
         }
 
-        public async Task<bool> UpdateCategoryAsync(CategoryUpdateDTO categoryUpdateDTO)
+        //public IResult UpdateCategory(CategoryUpdateDTO categoryUpdateDTO)
+        //{
+        //    try
+        //    {
+        //        using var context = new AppDbContext();
+        //        for (int i = 0; i < categoryUpdateDTO.LanguageCode.Count; i++)
+        //        {
+        //            var categoryLanguages = context.CategoryLanguages
+        //                .FirstOrDefault(x => x.CategoryId == categoryUpdateDTO.CategoryId && x.LangCode == categoryUpdateDTO.LanguageCode[i]);
+        //            if (categoryLanguages != null)
+        //            {
+        //                categoryLanguages.CategoryName = categoryUpdateDTO.LanguageCode[i];
+        //                context.Update(categoryLanguages);
+        //            }
+        //        }
+
+        //        context.SaveChanges();
+
+        //        return new Result(true, "Category  Yenilendi");
+
+        //    }
+        //    catch (Exception)
+        //    {
+
+        //        return new Result(false, "Category Yenilenmedi");
+        //    }
+        //}
+
+        public async Task<IResult> UpdateCategoryAsync(CategoryUpdateDTO categoryUpdateDTO)
         {
             try
             {
-                using var context = new AppDbContext();
-                for (int i = 0; i < categoryUpdateDTO.LanguageCode.Count; i++)
-                {
-                    var categoryLanguages = await context.CategoryLanguages
 
-                        .FirstOrDefaultAsync(x => x.CategoryId == categoryUpdateDTO.CategoryId && x.LangCode == categoryUpdateDTO.LanguageCode[i]);
-                    if (categoryLanguages != null)
+                using var context = new AppDbContext();
+                var category = context.Categories.Where(x => x.Id.ToString() == categoryUpdateDTO.CategoryId)
+                            .Include(x => x.User)
+                            .Include(x => x.CategoryProducts).ThenInclude(a => a.Product).ThenInclude(a => a.productLanguages)
+                            .Include(x => x.CategoryLanguages)
+                      ;
+                foreach (var categoryUP in category)
+                {
+                    categoryUP.UpdatedDate = DateTime.Now;
+                    categoryUP.UpdatedUserId = categoryUpdateDTO.UpdatedUserId;
+                    for (int i = 0; i < categoryUpdateDTO.NewCategoryName.Count; i++)
                     {
-                        categoryLanguages.CategoryName = categoryUpdateDTO.LanguageCode[i];
-                        context.Update(categoryLanguages);
+
+                        categoryUP.CategoryLanguages[i].CategoryName = categoryUpdateDTO.NewCategoryName[i];
+
                     }
                 }
 
-               await context.SaveChangesAsync();
+                context.UpdateRange(category);
+                await context.SaveChangesAsync();
 
-                return true;
+                return new Result(true, "Category  Yenilendi");
 
             }
             catch (Exception)
             {
 
-                return false;
+                return new Result(false, "Category Yenilenmedi");
             }
         }
     }

@@ -1,0 +1,15 @@
+﻿
+
+@model UserAddRoleDTO
+<form method="post">
+    <div class="form-group">
+        <input type="hidden" value="@Model.UserId" asp-for="UserId" />
+        <select class="form-control" name="roles" asp-for="Roles" multiple>
+            @foreach (var item in Model.Roles)
+            {
+                <option value="@item">@item</option>
+            }
+        </select>
+    </div>
+    <input type="submit" class="btn btn-outline-success" value="Add Role" />
+</form>

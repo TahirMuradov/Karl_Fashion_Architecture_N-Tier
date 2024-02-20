@@ -13,45 +13,48 @@ namespace Core.DataAccess.EntityFramework
         where TEntity : class, IEntity
         where TContext : DbContext, new()
     {
-        public void AddRepos(TEntity entity)
+        public bool Add(TEntity entity)
         {
             using var context = new TContext();
             var addEntity = context.Entry(entity);
             addEntity.State = EntityState.Added;
 
             context.SaveChanges();
+            return true;
         }
 
-        public async void AddAsyncRepos(TEntity entity)
+        public async Task<bool> AddAsync(TEntity entity)
         {
             using var context = new TContext();
             var addEntity = context.Entry(entity);
             addEntity.State = EntityState.Added;
 
           await  context.SaveChangesAsync();
+            return true;
         }
 
-        public void DeleteRepos(TEntity entity)
+        public bool Delete(TEntity entity)
         {
             using var context = new TContext();
             var addEntity = context.Entry(entity);
             addEntity.State = EntityState.Deleted;
 
             context.SaveChanges();
+            return true;
         }
 
-        public async void DeleteAsyncRepos(TEntity entity)
+        public async Task<bool> DeleteAsync(TEntity entity)
         {
             using var context = new TContext();
             var addEntity = context.Entry(entity);
             addEntity.State = EntityState.Added;
 
-          await  context.SaveChangesAsync();
+        var result=  await  context.SaveChangesAsync();
+        
+            return true;
         }
 
-      
-
-        public List<TEntity> GetAllRepos(Expression<Func<TEntity, bool>> expression)
+       public List<TEntity> GetAll(Expression<Func<TEntity, bool>> expression)
         {
              using var context = new TContext();
             return expression == null
@@ -59,36 +62,38 @@ namespace Core.DataAccess.EntityFramework
                  context.Set<TEntity>().Where(expression).ToList();
         }
 
-        public void UpdateRepos(TEntity entity)
+        public bool Update(TEntity entity)
         {
             using var context = new TContext();
             var updateEntity = context.Entry(entity);
             updateEntity.State = EntityState.Modified;
             context.SaveChanges();
+            return true;
         }
 
-        public async void UpdateAsyncRepos(TEntity entity)
+        public async Task<bool> UpdateAsync(TEntity entity)
         {
             using var context = new TContext();
             var updateEntity = context.Entry(entity);
             updateEntity.State = EntityState.Modified;
         await    context.SaveChangesAsync();
+            return true;
         }
 
-        public async Task<TEntity> GetAsyncRepos(Expression<Func<TEntity, bool>> expression)
+        public async Task<TEntity> GetAsync(Expression<Func<TEntity, bool>> expression)
         {
             using var context = new TContext();
             return
                 await context.Set<TEntity>().SingleOrDefaultAsync(expression);
         }
 
-        public TEntity GetRepos(Expression<Func<TEntity, bool>> expression)
+        public TEntity Get(Expression<Func<TEntity, bool>> expression)
         {
          using var context= new TContext();
             return context.Set<TEntity>().SingleOrDefault(expression);
         }
 
-        public Task<List<TEntity>> GetAllAsyncRepos(Expression<Func<TEntity, bool>> expression)
+        public Task<List<TEntity>> GetAllAsync(Expression<Func<TEntity, bool>> expression)
         {
           using var context=new TContext();
             return expression==null ?
@@ -96,5 +101,7 @@ namespace Core.DataAccess.EntityFramework
                 :context.Set<TEntity>().Where(expression).ToListAsync();
 
         }
+
+     
     }
 }

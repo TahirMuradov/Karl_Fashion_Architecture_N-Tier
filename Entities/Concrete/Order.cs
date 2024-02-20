@@ -1,5 +1,6 @@
 ﻿using Core.Entites;
 using Entities.Concrete;
+using Entities.Concrete.EnumClass;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,14 +11,16 @@ namespace Entities
 {
     public class Order:BaseEntity,IEntity
     {
-
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
+        public string  PhoneNumber { get; set; }
+        public string Email { get; set; }
+        public string Address { get; set; }
         public string OrderNumber { get; set; }
-        public string Location { get; set; }
-        public List<Product> Product { get; set; }
-        public int ProductQuantity { get; set; }
-        public decimal ProductPrice { get; set; }
         public string? Message { get; set; }
-        public string UserId { get; set; }
-        public User  User { get; set; }
+        public OrderStatus OrderStatus { get; set; }
+        public List<OrderProduct> Products { get; set; }
+
+ 
     }
 }

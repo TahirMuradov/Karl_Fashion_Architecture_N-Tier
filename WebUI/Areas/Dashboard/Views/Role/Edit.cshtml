@@ -1,0 +1,9 @@
+﻿@model Microsoft.AspNetCore.Identity.IdentityRole
+<form method="post">
+    <div class="form-group">
+        <label asp-for="Name"></label>
+        <input type="hidden" value="@Model.Id" asp-for="Id" />
+        <input type="text" value="@Model.Name" asp-for=Name class="form-control" />
+    </div>
+    <input type="submit" value="Submit" class="btn btn-success" />
+</form>

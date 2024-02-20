@@ -8,9 +8,11 @@ namespace Entities.DTOs.CategoryDTOs
 {
     public class CategoryUpdateDTO
     {
-        public Guid CategoryId { get; set; }
-        public Guid LanguagesId { get; set; }
-        public List<string> LanguageCode { get; set; }
-        public List< string> CategoryNewName { get; set; }
+        public string CategoryId { get; set; }
+        public List<Category>? SubCategoryName { get; set; }
+        public string UpdatedUserId { get; set; }
+        public DateTime UpdatedDateTime { get; set; }
+        public List<string> NewCategoryName { get; set; }
+        public List<string> LangCode { get; set; }
     }
 }

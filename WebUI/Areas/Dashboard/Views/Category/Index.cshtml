@@ -1,0 +1,133 @@
+﻿ @model  List<CategoryGetAdminListDTO>
+@inject Microsoft.AspNetCore.Identity.UserManager<User> _userManager;
+
+@{
+    int counter = 0;
+}
+    <div asp-validation-summary="All" class="text text-danger"></div>
+     
+    <div class="mx-auto"><a class="btn btn-outline-success" asp-controller="category" asp-action="create">Create Category</a></div>
+
+
+
+<table id="example" class="display" style="width:100%">
+    <thead>
+        <tr>
+
+            <th>#</th>
+            <th>Category Name</th>
+            <th>Category Launguage Code</th>
+            <th>Created User Name</th>
+            <th>Update Info</th>
+            <th>IsFeatured</th>
+            <th>Actions</th>
+
+        </tr>
+
+    </thead>
+    <tbody id="parent">
+        @foreach (var category in Model)
+        {
+            <tr id="@category.id">
+                <td>@counter</td>
+                <td>
+
+                    @for (int i = 0; i < category.CategoryName.Count; i++)
+                    {
+
+                        @category.CategoryName[i]
+                        @if (i < category.CategoryName.Count - 1)
+                        {
+                            @Html.Raw(", ")
+
+                        }
+
+
+                    }
+
+                </td>
+                <td>
+                    Created in  @for (int i = 0; i < category.LaunguageCode.Count; i++)
+                    {
+
+                        @category.LaunguageCode[i]
+                        @if (i < category.LaunguageCode.Count - 1)
+                        {
+                            @Html.Raw(", ")
+
+                        }
+                    }
+                </td>
+                <td>
+                    @category.UserName
+                </td>
+                <td>
+                    @if (category.UpdatedDate == null)
+                    {
+                        <p>Not Updated</p>
+                    }
+                    else
+                    {
+                        var user = await _userManager.FindByIdAsync(category.UpdatedUserId);
+                        <p>@category.UpdatedDate @Html.Raw(", ") @user.UserName</p>
+                    }
+                </td>
+                <td>@category.IsFeatured</td>
+                <td>
+                    <a onclick="" asp-action="Update" asp-route-categoryId="@category.id" class="btn btn-outline-warning ">Edit</a>
+                    <a class="btn btn-outline-danger" asp-action="delete" asp-route-categoryRemoveId="@category.id">Delete</a>
+                </td>
+            </tr>
+
+            counter += 1;
+
+        }
+    </tbody>
+
+    <tfoot>
+        <tr>
+
+            <th>#</th>
+            <th>Category Name</th>
+            <th>Category Launguage Code</th>
+            <th>Created User Name</th>
+            <th>Update Info</th>
+            <th>IsFeatured</th>
+            <th>Actions</th>
+
+        </tr>
+
+    </tfoot>
+</table>
+<script>
+    new DataTable('#example');
+
+    // function CategoryDelet(categoryId,categoryName) {
+
+    //     if (confirm(`Category Silinsinmi?${categoryName}`)) {
+
+       
+    //         var datas = new FormData();
+    //         datas.append("categoryRemoveId", categoryId)
+    //         $.ajax({
+    //             url: "/dashboard/category/delete",
+    //             type: "POST",
+    //             dataType: "json",
+    //             data: datas,
+
+    //             contentType: false,
+    //             processData: false,
+
+    //             success: function (e) {
+    //                 $('#parent').children(`#${categoryId}`).remove();
+    //                 console.log("isledi", e);
+    //             },
+    //             error: function (e) {
+    //                 console.log("islemedi")
+    //             }
+    //         });
+    //     }
+
+
+    // }
+</script>

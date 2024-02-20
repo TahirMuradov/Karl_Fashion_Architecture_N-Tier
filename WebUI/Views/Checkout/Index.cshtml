@@ -1,0 +1,244 @@
+﻿    
+@model ShippingMethodAndUserInfoDTO  
+
+@{
+    decimal totalCehckout = 0;
+    var shippingmethod = ViewBag.ShippingMethod as GetShippingMethodDTO;
+    totalCehckout += shippingmethod.Price;
+}
+
+<!-- ****** Checkout Area Start ****** -->
+<div class="checkout_area section_padding_100">
+    @if (TempData["Error"] is not null)
+    {
+        
+    @foreach (var error in TempData["Error"] as string)
+    {
+        <span class="text-danger">@error</span>
+    }
+    }
+    <div class="container">
+        <div class="alert alert-info">
+            <strong>Info!</strong> Sifarişi qəbul edəcək şəxsin məlumatlarini daxil edin
+        </div>
+    <div class="text-danger" asp-validation-summary="All"></div>
+            <form class="" method="post">
+        <div class="row">
+
+            <div class="col-12 col-md-6">
+                <div class="checkout_details_area mt-50 clearfix">
+
+                    <div class="cart-page-heading">
+                        <h5>Billing Address</h5>
+                        <p>Enter your cupone code</p>
+                    </div>
+
+                     
+                        <div class="row">
+                            @if (ViewBag.ShippingMethod is not null)
+                            {
+                               
+                                <input type="hidden" value="@shippingmethod.Id" asp-for="ShippingMethodId" name="ShippingMethodId" />
+                            }
+                            @if (User.Identity.IsAuthenticated)
+                            {
+                                User user = ViewBag.CurrentUserInfo as User;
+                                <div class="col-md-6 mb-3">
+                                    <span class="text-danger" asp-validation-for="FirstName"></span>
+
+                                    <label for="FirstName">Ad <span>*</span></label>
+                                    <input name="FirstName" asp-for=FirstName type="text" class="form-control" id="first_name" value="@user.FirstName" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                    <span class="text-danger" asp-validation-for="LastName"></span>
+                                    
+                                <label  for="last_name">Soy Ad <span>*</span></label>
+                                    <input name="LastName" type="text" asp-for=LastName class="form-control" id="last_name" value="@user.LastName" required>
+                            </div>
+                        
+                           
+                            <div class="col-12 mb-3">
+                                    <span class="text-danger" asp-validation-for="PhoneNumber"></span>
+
+                                    <label for="PhoneNumber">Telefon Nömrəsi <span>*</span></label>
+                                    <input asp-for=PhoneNumber class="form-control" type="tel" id="phone" name="PhoneNumber" placeholder="+994(000)-00-00"  value="@user.PhoneNumber" required>
+                            </div>
+                            <div class="col-12 mb-4">
+                                    <span class="text-danger" asp-validation-for="Email"></span>
+
+                                    <label for="Email">Elektron Poçt Ünvanı <span>*</span></label>
+                                    <input asp-for=Email name="Email" type="email" class="form-control" id="email_address" value="@user.Email">
+                                </div>
+
+                            }
+                            else
+                            {
+                                <div class="col-md-6 mb-3">
+                                    <span class="text-danger" asp-validation-for="FirstName"></span>
+
+                                    <label for="FirstName">Ad <span>*</span></label>
+                                    <input name="FirstName" asp-for=FirstName type="text" class="form-control" id="first_name" value="" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <span class="text-danger" asp-validation-for="LastName"></span>
+
+                                    <label for="LastName">Soy Ad <span>*</span></label>
+                                    <input asp-for=LastName name="LastName" type="text" class="form-control" id="last_name" value="" required>
+                                </div>
+
+
+                                <div class="col-12 mb-3">
+                                    <span class="text-danger" asp-validation-for="PhoneNumber"></span>
+
+                                    <label for="PhoneNumber">Telefon Nömrəsi <span>*</span></label>
+                                    <input asp-for="PhoneNumber" class="form-control" type="tel" id="phone" name="PhoneNumber" placeholder="+994(000)-00-00" pattern="^(?!0+$)(\+\d{1,3}[- ]?)?(?!0+$)\d{10,15}$" value="" required>
+                                </div>
+                                <div class="col-12 mb-4">
+                                    <span class="text-danger" asp-validation-for="Email"></span>
+
+                                    <label for="email">Elektron Poçt Ünvanı <span>*</span></label>
+                                    <input asp-for="Email" name="email" type="email" class="form-control" id="email_address" value="">
+                                </div>
+                            }
+                           
+
+                      
+                            <div class="col-12 mb-3">
+                                <span class="text-danger" asp-validation-for="Address"></span>
+
+                                <label for="street_address">Ünvan <span>*</span></label>
+                                <input asp-for=Address type="text" class="form-control mb-3" id="street_address" value="">
+                               
+                            </div>
+                            <div class="col-12 mb-3">
+                                <span class="text-danger" asp-validation-for="City"></span>
+
+                                <label for="city">Şəhər <span>*</span></label>
+                                <input asp-for=City name="city" type="text" class="form-control" id="city" value="">
+                            </div>
+                            <div class="col-12 mb-3">
+                                <span class="text-danger" asp-validation-for="PostCode"></span>
+
+                                <label for="postcode">Poç Kodu <span>*</span></label>
+                                <input asp-for="PostCode" type="text" class="form-control" id="postcode" value="">
+                            </div>
+                            <div class="col-12">
+                                <span class="text-danger" asp-validation-for="Message"></span>
+
+                                <label for="message" class="form-label">Əlavə Qeydlər</label>
+                                <textarea asp-for=Message class="form-control" name="message"  id="message" rows="3"></textarea>
+
+                            </div>
+                            <div class="col-12">
+                                <div class="custom-control custom-checkbox d-block mb-2">
+                                    <span class="text-danger" asp-validation-for="ConfirmedDataInUser"></span>
+                                    <input asp-for=ConfirmedDataInUser type="checkbox" class="custom-control-input" name="ConfirmedDataInUser" id="ConfirmedDataInUser">
+                                    <label class="custom-control-label" for="ConfirmedDataInUser">Məlumatlarin Duzgunluyunu Təsdiqləyirəm</label>
+                                </div>
+                             
+                            </div>
+                        </div>
+                        <button type="submit" class="btn karl-checkout-btn">Tesdiq</button>
+
+                       
+                   
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6 col-lg-5 ml-lg-auto">
+                <div class="order-details-confirmation">
+
+                    <div class="cart-page-heading">
+                        <h5>Your Order</h5>
+                        <p>The Details</p>
+                    </div>
+
+                    
+                  
+                    <ul class="order-details-form mb-4">
+                      
+                      
+                            
+
+
+                        <li>
+                            <span class="font-weight-bold">Mehsul Kodu</span> <span class="font-weight-bold">Mehsul Adi</span> <span class="font-weight-bold">Olcu</span> <span class="font-weight-bold">Sayi</span><span class="font-weight-bold">Qiymeti</span>
+                        </li>
+
+                        @foreach (var product in ViewBag.CartItems as List<CartAddItemCookieDTO>)
+                        {
+                            totalCehckout += product.Price * product.Quantity;
+                            <li>
+                                <span>@product.ProductCode</span><span>@product.ProductName</span><span>@product.Size</span> <span>@product.Quantity</span> <span>@product.Price &#x20BC</span>
+                            </li>
+                                
+                            }
+
+                        <hr />
+                        <li>
+                            <span class="font-weight-bold">Catdirilma Novu</span>
+                            <span class="font-weight-bold">Qiymeti</span>
+                        </li>
+                        <li>
+
+                            <span >@shippingmethod.Content</span> <span>@shippingmethod.Price &#x20BC</span> 
+                        </li>
+                         
+
+                        </li>
+
+                        
+                        <li><span>Total</span> <span>@totalCehckout &#x20BC</span></li>
+                    </ul>
+
+
+                    <div id="accordion" role="tablist" class="mb-4">
+                       @*  <div class="form-check">
+                            <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
+                            <label class="form-check-label" for="flexRadioDefault1">
+                                Kuryere odenis
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2" checked>
+                            <label class="form-check-label" for="flexRadioDefault2">
+                              Online Odenis
+                            </label>
+                        </div> *@
+                    </div>
+                        @foreach (GetPaymentMethodDTO paymentMethod in ViewBag.PaymentMethods as List<GetPaymentMethodDTO>)
+                        {
+                            if (paymentMethod.Api)
+                            {
+                                
+                        <div class="form-check">
+                                    <input name="PaymentsMethodId" class="form-check-input" type="radio"  id="@paymentMethod.Id" value="@paymentMethod.Id" checked>
+                                    <label class="form-check-label" for="@paymentMethod.Id">
+                               @paymentMethod.Content
+                            </label>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="form-check">
+                                    <input name="PaymentsMethodId" class="form-check-input" type="radio" id="@paymentMethod.Id" value="@paymentMethod.Id" >
+                                    <label class="form-check-label" for="@paymentMethod.Id">
+                                       @paymentMethod.Content
+                                    </label>
+                                </div>
+                            }
+                        }
+                   
+                     
+                </div>
+            </div>
+        </div>
+             </form>
+    </div>
+</div>
+<!-- ****** Checkout Area End ****** -->
+@section scripts{
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap-grid.min.css" integrity="sha512-ZuRTqfQ3jNAKvJskDAU/hxbX1w25g41bANOVd1Co6GahIe2XjM6uVZ9dh0Nt3KFCOA061amfF2VeL60aJXdwwQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.min.js" integrity = "sha512-WW8/jxkELe2CAiE4LvQfwm1rajOS8PHasCCx+knHG0gBHt8EXxS6T6tJRTGuDQVnluuAvMxWF4j8SNFDKceLFg==" crossorigin = "anonymous" referrerpolicy = "no-referrer" ></script>
+    
+}

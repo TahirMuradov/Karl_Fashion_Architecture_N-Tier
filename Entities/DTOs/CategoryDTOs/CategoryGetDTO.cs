@@ -8,6 +8,7 @@ namespace Entities.DTOs.CategoryDTOs
 {
     public class CategoryGetDTO
     {
-        public Guid categoryId {  get; set; }
+        public string CategoryId { get; set; }
+        public string CategoryName { get; set; }
     }
 }

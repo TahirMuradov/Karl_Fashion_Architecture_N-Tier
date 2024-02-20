@@ -1,0 +1,11 @@
+﻿@model CategoryRemoveDTO
+<form method="post">
+    <div asp-validation-summary="All"></div>
+    <input type="hidden" value="@Model.CategoryName" asp-for="CategoryName" />
+    <input type="hidden" value="@Model.CategoryId" asp-for="CategoryId" />
+    <div class="alert alert-danger">
+        <strong>@Model.CategoryName!</strong> Categorini Silmek Isteyirsinizmi?
+    </div>
+    <button type="submit" class="btn btn-danger">Yes</button>
+    <a asp-action="index" class="btn btn-success">No</a>
+</form>

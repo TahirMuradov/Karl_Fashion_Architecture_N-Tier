@@ -1,46 +1,40 @@
-﻿using AutoMapper;
-using Bussines.Abstract;
-using Bussines.Concrete;
-using Core.Helper;
-using Core.Utilities.ConfirmMessageSend;
-using Core.Utilities.Results.Concrete.ErrorResults;
-using Core.Utilities.Results.Concrete.SuccessResults;
+﻿using Bussines.Abstract;
+using Core.Helper.EmailHelper;
 using Entities.Concrete;
 using Entities.DTOs.UserDTOs;
-using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Win32;
-using NuGet.Common;
-using System.Security.Policy;
+using System.Numerics;
+using System.Text.RegularExpressions;
 
 namespace WebUI.Controllers
 {
-    public class AuthController : Controller
-    {
-        public readonly IUserService _userService;
-        public readonly UserManager<User> _userManager;
-        public readonly RoleManager<IdentityRole> _roleManager;
-        public readonly SignInManager<User> _signInManager;
-        public readonly IConfiguration _config;
-        public readonly IMapper _mapper;
 
-        public AuthController(IUserService userService, UserManager<User> userManager, RoleManager<IdentityRole> roleManager, SignInManager<User> signInManager, IMapper mapper, IConfiguration config)
+    public class AuthController :BaseController
+    {
+        private readonly IUserService _userService;
+        private readonly UserManager<User> _userManager;
+        private readonly SignInManager<User> _signInManager;
+        private readonly IEmailHelper _emailHelper;
+
+
+        public AuthController(IUserService userService, UserManager<User> userManager, SignInManager<User> signInManager, IEmailHelper emailHelper)
         {
             _userService = userService;
             _userManager = userManager;
-            _roleManager = roleManager;
             _signInManager = signInManager;
-            _mapper = mapper;
-            _config = config;
+            _emailHelper = emailHelper;
+
         }
 
         public IActionResult Login()
         {
 
-
+            if (User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction(controllerName: "home", actionName: "index");
+            }
 
 
             return View();
@@ -72,171 +66,253 @@ namespace WebUI.Controllers
                 ModelState.AddModelError("Error", "Elektron Poct Tesdiqlenmeyib ! Elektron Poctunuzu Mesaj hissesinden size gonderilen linke kecid ederek tesdiqleyin!Eks Halda 1 Gun Erzinde Qeydiyatiniz Legv Olunacaq!");
                 return View();
             }
-            Microsoft.AspNetCore.Identity.SignInResult signInResult = await _signInManager.PasswordSignInAsync(checkEmail, user.Password, user.RememberMe, false);
+                Microsoft.AspNetCore.Identity.SignInResult signInResult = await _signInManager.PasswordSignInAsync(checkEmail, user.Password, user.RememberMe, true);
             if (!signInResult.Succeeded)
             {
-                ModelState.AddModelError("Error", "Email or Password is not valid!");
+               
                 return View();
             }
 
             return RedirectToAction(controllerName: "home", actionName: "index");
 
         }
+       
+        public async Task< IActionResult> LogOut()
+        {
+            await _signInManager.SignOutAsync();
+            return RedirectToAction("Index", "Home");
+            
+        }
         [HttpGet]
         public async Task<IActionResult> Register()
         {
+            if (User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction(controllerName: "home", actionName: "index");
+            }
 
             return View();
         }
         [HttpPost]
         public async Task<IActionResult> Register(UserRegisterDTO userRegisterDTO)
         {
-            try
+            if (!Regex.IsMatch(userRegisterDTO.PhoneNumber, "^(?!0+$)(\\+\\d{1,3}[- ]?)?(?!0+$)\\d{10,15}$"))
             {
-                if (!ModelState.IsValid) { ModelState.AddModelError("Error", "Data is Empty!"); return View(); }
-
-
-
-                var checkEmail = await _userManager.FindByEmailAsync(userRegisterDTO.Email);
-
-                if (checkEmail is not null)
-                {
-                    ModelState.AddModelError("Error", "Bu Emailda Istifadeci Artiq qeydiyyatdan kecib");
-                    return View();
-                }
-
-                var map = _mapper.Map<User>(userRegisterDTO);
-                map.UserName = UserNameHelper.CreatingUserName(map.FirstName, map.LastName);
-                map.ConfirmeTime = DateTime.Now.AddDays(1);
-
-                IdentityResult result = await _userManager.CreateAsync(map, userRegisterDTO.Password);
-
-                var a = result.Errors;
-                if (!result.Succeeded)
-                {
-                    foreach (var error in result.Errors)
-                    {
-
-                        ModelState.AddModelError("Error", error.Description);
-                    }
-                    return View();
-                }
-                else
-                {
-
-                    string token = await _userManager.GenerateEmailConfirmationTokenAsync(map).ConfigureAwait(false);
-
-                    var confirmLink =
-                        Url.ActionLink(controller: "Auth", action: "ConfirmEmail", host: Request.Host.Value, values: new { token, currentEmail = map.Email });
-
-
-
-                    bool resultMessage = EmailConfirme.SendEmail(UserName: $"{map.FirstName} {map.LastName}", userEmail: map.Email, confirmationLink: confirmLink, fromEmail: _config["EmailServices:FromEmail"], fromEmailPassword: _config["EmailServices:FromEmailPassword"], serviceName: _config["EmailServices:ServiceName"], servicePort: Convert.ToInt32(_config["EmailServices:ServicePort"]));
-                    if (!resultMessage)
-                    {
-                        ModelState.AddModelError("Error", "Email Tesdiqleme Mesaji gonderile Bilmedi");
-
-                        return View();
-                    }
-                }
-                if (_userManager.Users.ToList().Count() == 1)
-                {
-                    if (!_roleManager.Roles.Any(x => x.Name == "Admin"))
-                    {
-                        IdentityRole newRole = new IdentityRole()
-                        {
-                            Name = "Admin"
-                        };
-                        await _roleManager.CreateAsync(newRole);
-                        await _userManager.AddToRoleAsync(map, "Admin");
-
-                    }
-                    else
-                    {
-
-
-                        await _userManager.AddToRoleAsync(map, "Admin");
-                    }
-                }
-                else
-                {
-                    if (!_roleManager.Roles.Any(x => x.Name == "User"))
-                    {
-                        IdentityRole newRole = new IdentityRole()
-                        {
-                            Name = "User"
-                        };
-                        await _roleManager.CreateAsync(newRole);
-                        await _userManager.AddToRoleAsync(map, "User");
-
-                    }
-                    else
-                    {
-
-
-                        await _userManager.AddToRoleAsync(map, "User");
-                    }
-
-
-
-                }
-                return RedirectToAction("Login");
-
-
-
-
-
-
-
+                ModelState.AddModelError("Error", "Please enter valid phone no.");
+                return View();
             }
-            catch (Exception ex)
+            userRegisterDTO.UserName= userRegisterDTO.UserName.Trim(' ');
+            var result = await _userService.AddUserAsync(userRegisterDTO);
+            if (!result.IsSuccess)
             {
-
-                return View(ex.Message);
+                ModelState.AddModelError("Error", result.Message);
+                return View();
             }
+
+            User user = _userManager.Users.FirstOrDefault(x => x.Id == result.Data.Id);
+            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+
+            user.ConfirmeTime = DateTime.Now.AddDays(1);
+            await _userManager.UpdateAsync(user);
+            var confirmLink = Url.ActionLink(controller: "Auth",
+                action: "ConfirmEmail",
+                host: Request.Host.Value,
+                values: new { token, currentEmail = user.Email });
+            await _emailHelper.SendEmailAsync(user.Email, confirmLink, user.UserName);
+
+            return RedirectToAction("Login");
+
 
         }
 
+        public IActionResult ForgotPassword()
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction(controllerName: "home", actionName: "index");
+            }
+
+            return View();
+        }
+        [HttpPost]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordDTO forgotPasswordDTO)
+        {
+            if (!ModelState.IsValid)
+            {
+
+                return View();
+            }
+            var user = await _userManager.FindByEmailAsync(forgotPasswordDTO.Email);
+            if (user == null)
+            {
+                ModelState.AddModelError("Error", "İstifadeci Tapilmadi");
+                return View();
+            }
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            if (user.ConfirmeTime is null)
+            {
+
+                user.ConfirmeTime = DateTime.Now.AddDays(1);
+            }
+            else
+            {
+                ModelState.AddModelError("Error", "Size Tesdiqleme Linki Gonderilib!");
+                return View();
+            }
+         
+            var confirmLink = Url.ActionLink(controller: "Auth",
+                action: "ForgotPasswordChange",
+                host: Request.Host.Value,
+                values: new { token, email = user.Email });
+            var result = await _emailHelper.SendEmailAsync(user.Email, confirmLink, user.UserName);
+            if (result.IsSuccess)
+            {
+                ModelState.AddModelError("Error", "Elektron Poctunuza Tesdiqleme Linki Gonderildi!");
+                await _userManager.UpdateAsync(user);
+                return View();
+            }
+            else
+            {
+                ModelState.AddModelError("Error", "Prablem Yarandi Tekrar Yoxlayin");
+
+                return View();
+            }
+        }
+        [HttpGet]
+        public async Task<IActionResult> ForgotPasswordChange(string token, string email)
+        {
+            User user = await _userManager.FindByEmailAsync(email);
+            if (user == null || user.ConfirmeTime is null)
+            {
+               return RedirectToAction("ErrorPage");
+            }
+            bool tokenResult = await _userManager.VerifyUserTokenAsync(
+               user: user,
+               tokenProvider: _userManager.Options.Tokens.PasswordResetTokenProvider,
+               purpose: UserManager<User>.ResetPasswordTokenPurpose,
+               token: token
+                              );
+            ForgotPasswordChangeDTO forgotPasswordChangeDTO = new ForgotPasswordChangeDTO();
+
+            if (!tokenResult)
+            {
+                RedirectToAction("ErrorPage");
+            }
+            else
+            {
+                forgotPasswordChangeDTO.Token = token;
+                forgotPasswordChangeDTO.UserId = user.Id;
+
+            }
+
+            user.ConfirmeTime = null;
+            await _userManager.UpdateAsync(user);
+
+            return View(forgotPasswordChangeDTO);
+        }
+        [HttpPost]
+        public async Task<IActionResult> ForgotPasswordChange(ForgotPasswordChangeDTO forgotPasswordChangeDTO)
+        {
+            User user = await _userManager.FindByIdAsync(forgotPasswordChangeDTO.UserId);
+            if (user == null)
+            {
+                ModelState.AddModelError("Error", "User Tapilmadi");
+                return View();
+            };
+            IdentityResult result = await _userManager.ResetPasswordAsync(user, forgotPasswordChangeDTO.Token, forgotPasswordChangeDTO.ForgotPasswordChange);
+            if (result.Succeeded)
+            {
+
+                return Redirect("Login");
+
+            }
+            else
+            {
+                return RedirectToAction("Errorpage");
+            }
+        }
         public async Task<IActionResult> ConfirmEmail(string token, string currentEmail, string newEmail = null)
         {
+
+            if (newEmail is not null)
+            {
+                if (!string.IsNullOrEmpty(currentEmail) && !string.IsNullOrEmpty(token))
+                {
+                   
+
+
+                    var user = await _userManager.FindByEmailAsync(currentEmail);
+                    if (user == null)
+                    {
+                        ModelState.AddModelError("Error", "Istifaddeci Tapilmadi");
+                    }
+
+                    if ((user.EmailConfirmed == true && user.ConfirmeTime < DateTime.Now) || user.ConfirmeTime == null)
+                    {
+                        return Redirect("auth/erropage");
+                    }
+                    var EmailChange = await _userManager.ChangeEmailAsync(user, newEmail, token);
+                    user.ConfirmeTime = null;
+                    if (EmailChange.Succeeded)
+                    {
+                        await _userManager.UpdateAsync(user);
+                    }
+                    else
+                    {
+                        return Redirect("auth/erropage");
+                    }
+                    return Redirect("dashboard/index");
+
+
+
+
+
+                }
+
+            }
+
             if (!string.IsNullOrEmpty(currentEmail) && !string.IsNullOrEmpty(token))
             {
 
+
                 var user = await _userManager.FindByEmailAsync(currentEmail);
-                if (user == null)
+
+                if ((user.EmailConfirmed == true && user.ConfirmeTime < DateTime.Now) || user.ConfirmeTime == null)
                 {
-                  
+                    return RedirectToAction("errorpage");
                 }
-               //if(user.EmailConfirmed==false) {
-                
-                
-                var tokenConfirm = await _userManager.VerifyUserTokenAsync(
-                    user: user,
-                    tokenProvider: _userManager.Options.Tokens.EmailConfirmationTokenProvider,
-                    purpose: UserManager<User>.ConfirmEmailTokenPurpose,
-                    token: token
 
-                    );
-               
-                var a = await _userManager.ConfirmEmailAsync(user, token);
-                    if (a .Succeeded)
-                    {
-                        var authenticationManager = HttpContext.Request.Cookies.FirstOrDefault(c => c.Value.ToString() ==token).Key;
-                    
-                       HttpContext.Response.Cookies.Delete(authenticationManager);
-                    }
-                await _userManager.UpdateAsync(user);
+
+                var EmailConfirm = await _userManager.ConfirmEmailAsync(user, token);
+                user.ConfirmeTime = null;
+                if (EmailConfirm.Succeeded)
+                {
+                    await _userManager.UpdateAsync(user);
+                }
+                else
+                {
+                    return RedirectToAction("errorpage");
+                }
                 return RedirectToAction("Login");
-                //}
-                    
 
-              
-  
+
+
+
+
             }
-            return RedirectToAction("Register");
+            else
+            {
+                return Redirect("auth/erropage");
+            }
+
 
         }
 
+        public IActionResult ErrorPage()
+        {
+
+            return View();
+        }
 
 
     }

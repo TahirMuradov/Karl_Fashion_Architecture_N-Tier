@@ -21,39 +21,48 @@ namespace Bussines.Concrete
         public CategoryManager(ICategoryDAL categoryDAL)
         {
             _categoryDAL = categoryDAL;
-            
-            
+
+                   
         }
 
         public IResult AddCategory(CategoryAddDTO categoryAddDTO)
         {
-            return _categoryDAL.AddCategory(categoryAddDTO) ? new SuccessResult("Category created successfully") : new ErrorResult();
+            return _categoryDAL.AddCategory(categoryAddDTO);
         }
 
-        public async Task< IResult> AddCategoryAsync(CategoryAddDTO categoryAddDTO)
+        public async Task<IResult> AddCategoryAsync(CategoryAddDTO categoryAddDTO)
         {
-            return await _categoryDAL.AddCategoryAsync(categoryAddDTO) ? new SuccessResult("Category created successfully") : new ErrorResult();
-
+            return await _categoryDAL.AddCategoryAsync(categoryAddDTO);
         }
 
         public IResult DeleteCategory(CategoryRemoveDTO categoryRemoveDTO)
         {
-            return _categoryDAL.DeleteCategory(categoryRemoveDTO) ? new SuccessResult("Category deleted successfully") : new ErrorResult();
+      return _categoryDAL.DeleteCategory(categoryRemoveDTO);
         }
 
-        public async Task< IResult> DeleteCategoryAsync(CategoryRemoveDTO categoryRemoveDTO)
+        public async Task<IResult> DeleteCategoryAsync(CategoryRemoveDTO categoryRemoveDTO)
         {
-            return await _categoryDAL.DeleteCategoryAsync(categoryRemoveDTO) ? new SuccessResult("Category deleted successfully") : new ErrorResult();
+            return await _categoryDAL.DeleteCategoryAsync(categoryRemoveDTO);
         }
 
-        public  IResult UpdateCategory(CategoryUpdateDTO categoryUpdateDTO)
+        public async Task<IDataResult< List<CategoryGetAdminListDTO>>> GetCategoryAdminListAsync( Expression<Func<Category,bool>>? expression=null)
         {
-            return  _categoryDAL.UpdateCategory(categoryUpdateDTO) ? new SuccessResult("Category updated successfully") : new ErrorResult();
+            return expression is not null? await _categoryDAL.GetCategoriesAsync(expression: expression): await _categoryDAL.GetCategoriesAsync();
         }
+
+        public IDataResult<List<CategoryGetDTO>> GetCategoryName(string culture)
+        {
+            return _categoryDAL.GetCategoryName(culture);
+        }
+
+        //public IResult UpdateCategory(CategoryUpdateDTO categoryUpdateDTO)
+        //{
+        // return _categoryDAL.UpdateCategoryAsync(categoryUpdateDTO);
+        //}
 
         public async Task<IResult> UpdateCategoryAsync(CategoryUpdateDTO categoryUpdateDTO)
         {
-          return await _categoryDAL.UpdateCategoryAsync(categoryUpdateDTO) ? new SuccessResult("Category updated successfully") : new ErrorResult();
+          return await _categoryDAL.UpdateCategoryAsync(categoryUpdateDTO);
         }
     }
 }

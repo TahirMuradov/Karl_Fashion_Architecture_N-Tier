@@ -1,0 +1,177 @@
+﻿@model ProductAddDTO
+<div asp-validation-summary="All" class="text-danger"></div>
+<form method="post"  enctype="multipart/form-data">
+    <div class="form-group">
+        <label asp-for="ProductCode"></label>
+        <input type="text" value="" asp-for="ProductCode" class="form-control" />
+        <span asp-validation-for="ProductCode" class="text text-danger"></span>
+    </div>
+    <div class="form-group">
+        
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item active" role="presentation">
+            <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="false">AZ</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">RU</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab" aria-controls="contact" aria-selected="false">US</button>
+        </li>
+    </ul>
+    <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+            <div class="form-group">
+                <input type="text" class="form-control" asp-for="ProductName" name="ProductName" placeholder="ProductName in AZ" />
+              
+            </div>
+        </div>
+        <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+            <div class="form-group">
+                <input type="text" class="form-control" asp-for="ProductName" name="ProductName" placeholder="ProductName in RU" />
+              
+            </div>
+        </div>
+        <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
+            <div class="form-group">
+                <input type="text" class="form-control" asp-for="ProductName" name="ProductName" placeholder="ProductName in US" />
+            
+            </div>
+        </div>
+    </div>
+    </div>
+    
+    <div class="form-group">
+
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item active" role="presentation">
+                <button class="nav-link active" id="home_dec-tab" data-bs-toggle="tab" data-bs-target="#home_dec" type="button" role="tab" aria-controls="home_dec" aria-selected="false">AZ</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="profile_dec-tab" data-bs-toggle="tab" data-bs-target="#profile_dec" type="button" role="tab" aria-controls="profile_dec" aria-selected="false">RU</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="contact_dec-tab" data-bs-toggle="tab" data-bs-target="#contact_dec" type="button" role="tab" aria-controls="contact_dec" aria-selected="false">US</button>
+            </li>
+        </ul>
+        <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" id="home_dec" role="tabpanel" aria-labelledby="home_dec-tab">
+                <div class="form-group">
+                    <input type="text" class="form-control" asp-for="ProductDescrption" name="ProductDescrption" placeholder="ProductDescrption in AZ" />
+                    <input type="hidden" asp-for="LangCode" value="az" name="LangCode" />
+                </div>
+            </div>
+            <div class="tab-pane fade" id="profile_dec" role="tabpanel" aria-labelledby="profile_dec-tab">
+                <div class="form-group">
+                    <input type="text" class="form-control" asp-for="ProductDescrption" name="ProductDescrption" placeholder="ProductDescrption in RU" />
+                    <input type="hidden" asp-for="LangCode" value="ru" name="LangCode" />
+                </div>
+            </div>
+            <div class="tab-pane fade" id="contact_dec" role="tabpanel" aria-labelledby="contact_dec-tab">
+                <div class="form-group">
+                    <input type="text" class="form-control" asp-for="ProductDescrption" name="ProductDescrption" placeholder="ProductDescrption in US" />
+                    <input type="hidden" asp-for="LangCode" value="en" name="LangCode" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+  
+    <div class="form-group">
+        <label asp-for="CategoryId">Category Name</label>
+        
+    <select multiple class="form-control" asp-for=CategoryId name="CategoryId">
+            @if (ViewBag.Category is List<CategoryGetDTO> category && category.Count>0)
+            {
+             
+                    @foreach (var item in ViewBag.Category as List<CategoryGetDTO>)
+                    {
+                        <option value="@item.CategoryId">@item.CategoryName</option>
+                    }
+
+            }
+    </select>
+    </div>
+    <div class="form-group">
+        <span  class="text-warning d-block">*Qeyd:Əgər Ölçü Yoxdursa 0 yazmaq Kifayətdir!</span>
+
+        <label asp-for="Sizes"></label>
+        <div class="w-100 d-flex flex-wrap">
+            @if (ViewBag.Sizes is not null)
+            {
+                
+            @foreach (var size in ViewBag.Sizes)
+            {
+                
+            <div class="col-2">
+
+        <details>
+        <summary class="form-control">
+            <p>@size</p>         
+            <input  type="hidden" value="@size"   asp-for="Sizes"/>
+        </summary>
+            <input class="form-control" asp-for=SizesCount type="number" value="0" min="0"/>
+        </details>
+            </div>
+            }
+            }
+        </div>
+
+
+    </div>
+    <div class="form-group" id="color" >
+        <label asp-for="Color"></label>
+        <input type="color" value="" asp-for="Color"  class="form-control-color"/>
+        <span asp-validation-for="ProductCode" class="text text-danger"></span>
+      
+    </div>
+        <span class="text-warning">*Qeyd:Əgər Endrimli Qiymət Yoxdursa 0 yazmaq Kifayətdir!</span>
+    <div class="form-group d-flex" id="color">
+        <div class="col-12 col-md-5">
+
+        <label asp-for="Price"></label>
+            <input class="form-control" type="number" step="0.01" min="0.00" value="" asp-for="Price" />
+        <span asp-validation-for="Price" class="text text-danger"></span>
+        </div>
+        <div class="col-12 col-md-5">
+
+            <label asp-for="DisCount"></label>
+            <input class="form-control" type="number"  step="0.01" min="0.00" value="" asp-for="DisCount" />
+            <span asp-validation-for="DisCount" class="text text-danger"></span>
+        </div>
+
+    </div>
+    <div class="form-group">
+        <label for="Photo" ></label>
+        <input  type="file" multiple accept="image/*" value="" id="photo" name="Photo" class="form-control-file" />
+        
+            <div class="d-flex flex-wrap" id="img_box">
+            <img src="" alt="" />
+            </div>
+       
+    </div>
+    <div class="form-group">
+        <label asp-for="isFeatured">Featured</label>
+        <input type="checkbox" asp-for="isFeatured" />
+    </div>
+  
+        <button class="btn btn-outline-success" type="submit">Save</button>
+
+</form>
+@section scripts{
+    <script>
+
+        $("#photo").change(function () {
+                $("#img_box").children().remove();
+            $.each(this.files, function (index, file) {
+
+                $("#img_box").append(`<div class="col-2">
+                    
+
+                                                            <img  src="${URL.createObjectURL(file)}" for="photo" id="photo" name="Photo" class="img-fluid rounded-1" alt="" />
+                                                </div>`);
+            });
+        });
+      
+    </script>
+}

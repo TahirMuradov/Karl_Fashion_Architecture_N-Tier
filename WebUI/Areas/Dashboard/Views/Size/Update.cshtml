@@ -1,0 +1,14 @@
+﻿@model UpdateSizeDTO
+<form method="post">
+    <div asp-validation-summary="All"></div>
+    <input type="hidden" asp-for=UpdatedUserId value="@Model.UpdatedUserId" />
+    <input type="hidden"asp-for="SizeId" value="@Model.SizeId" />
+    <div class="form-group">
+        <label  asp-for="NewSizeContent" >Size</label>
+        <input class="form-control" type="text" asp-for=NewSizeContent value="@Model.NewSizeContent" />
+        <span asp-validation-for="NewSizeContent"></span>
+
+
+    </div>
+    <button type="submit" class="btn btn-outline-success">Save</button>
+</form>

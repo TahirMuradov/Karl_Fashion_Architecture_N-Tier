@@ -11,10 +11,16 @@ namespace Entities.Concrete
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
+        
         public DateTime? ConfirmeTime { get; set; }
+   
   public List<Order>? Orders { get; set; }
-        public List<UserActions>? UserActions { get; set; }
-     
+        public List<Product>? Products { get; set; }
+        public List<Size>? Sizes { get; set; }
+        public List<Category>? Categories { get; set; }
+  
+
+
 
 
     }

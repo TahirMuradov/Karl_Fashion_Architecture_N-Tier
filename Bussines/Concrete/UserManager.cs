@@ -1,39 +1,40 @@
-﻿using Bussines.Abstract;
+﻿using AutoMapper;
+using Bussines.Abstract;
+using Core.Helper;
 using Core.Utilities.Results.Abstract;
+using Core.Utilities.Results.Concrete.ErrorResults;
+using Core.Utilities.Results.Concrete.SuccessResults;
 using Entities.Concrete;
 using Entities.DTOs.UserDTOs;
 using Microsoft.AspNetCore.Identity;
-using System.Linq.Expressions;
-using Core.Utilities.Results.Concrete;
-using Core.Utilities.Results.Concrete.ErrorResults;
-using Core.Helper;
-using Azure.Core;
-using System.Security.Policy;
-using System.Text.Encodings.Web;
-using Core.Utilities.Results.Concrete.SuccessResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Core.Utilities.ConfirmMessageSend;
 using Microsoft.Extensions.Configuration;
+using System.Linq.Expressions;
 namespace Bussines.Concrete
 {
     public class UserManager : IUserService
     {
-        public readonly UserManager<User> _userManager;
-        public readonly RoleManager<IdentityRole> _roleManager;
-        public readonly  IConfiguration _config;
-
-        public UserManager(UserManager<User> userManager, RoleManager<IdentityRole> roleManager, IConfiguration config = null)
+        private readonly UserManager<User> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly  IConfiguration _config;
+        private readonly IMapper _mapper;
+    
+        
+        public UserManager(UserManager<User> userManager, RoleManager<IdentityRole> roleManager, IConfiguration config = null, IMapper mapper = null)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _config = config;
+            _mapper = mapper;
+            
         }
 
 
 
         public IDataResult<User> GetUser(Expression<Func<User, bool>> expression)
         {
-            User user = _userManager.Users.FirstOrDefault(expression);
+                User user = _userManager.Users.FirstOrDefault(expression);
             if (user != null) 
             return new SuccessDataResult<User>(user);
           
@@ -98,15 +99,92 @@ namespace Bussines.Concrete
                 var confirmLink = url + $"?token={token}&newEmail={userUpdateDTO.Email}&currentEmail={user.Email}";
                 
           
-                bool result=  EmailConfirme.SendEmail(UserName:$"{user.FirstName} {user.LastName}" ,userEmail:user.Email,confirmationLink:confirmLink,fromEmail: _config["EmailServices:FromEmail"],fromEmailPassword: _config["EmailServices:FromEmailPassword"],serviceName: _config["EmailServices:ServiceName"],servicePort:Convert.ToInt32(_config["EmailServices:ServicePort"]));
-                if (!result)
-                    return new ErrorResult("Email Gonderile Bilmedi");
+                //bool result=  EmailHelper.SendEmail(UserName:$"{user.FirstName} {user.LastName}" ,userEmail:user.Email,confirmationLink:confirmLink,fromEmail: _config["EmailServices:FromEmail"],fromEmailPassword: _config["EmailServices:FromEmailPassword"],serviceName: _config["EmailServices:ServiceName"],servicePort:Convert.ToInt32(_config["EmailServices:ServicePort"]));
+                //if (!result)
+                //    return new ErrorResult("Email Gonderile Bilmedi");
               
             }
             if (user.PhoneNumber != userUpdateDTO.PhoneNumber)
                 user.PhoneNumber = userUpdateDTO.PhoneNumber;
             await _userManager.UpdateAsync(user);
             return new SuccessResult("success");
+        }
+
+      public async Task<IDataResult<User>> AddUserAsync(UserRegisterDTO userRegisterDTO)
+        {
+            
+            try
+            {
+                if (userRegisterDTO is null)
+                {
+                    return new ErrorDataResult<User>("Info Tam Deyil");
+                }
+                var checkEmail = await _userManager.FindByEmailAsync(userRegisterDTO.Email);
+                if (checkEmail is not null)
+                {
+                    return new ErrorDataResult<User>("Bu Emailde Qeydiyyatda Istifadeci var");
+                }
+  
+                var map = _mapper.Map<User>(userRegisterDTO);
+    
+                IdentityResult result = await _userManager.CreateAsync(map, userRegisterDTO.Password);
+                if (!result.Succeeded)
+                {
+                    return new ErrorDataResult<User>("Qeydiyyatda Prablem Yarandi Yeniden Yoxlayin");
+                }
+                else
+                {
+                    if (_userManager.Users.ToList().Count() == 1)
+                    {
+                        if (!_roleManager.Roles.Any(x => x.Name == "Admin"))
+                        {
+                            IdentityRole newRole = new IdentityRole()
+                            {
+                                Name = "Admin"
+                            };
+                            await _roleManager.CreateAsync(newRole);
+                            await _userManager.AddToRoleAsync(map, "Admin");
+
+                        }
+                        else
+                        {
+
+
+                            await _userManager.AddToRoleAsync(map, "Admin");
+                        }
+                    }
+                    else
+                    {
+                        if (!_roleManager.Roles.Any(x => x.Name == "User"))
+                        {
+                            IdentityRole newRole = new IdentityRole()
+                            {
+                                Name = "User"
+                            };
+                            await _roleManager.CreateAsync(newRole);
+                            await _userManager.AddToRoleAsync(map, "User");
+
+                        }
+                        else
+                        {
+
+
+                            await _userManager.AddToRoleAsync(map, "User");
+                        }
+
+
+
+                    }
+                }
+                return new SuccessDataResult<User>(map,"Qeydiyyat Ugurla Basa Catdi");
+
+            }
+            catch (Exception ex)
+            {
+
+                return new ErrorDataResult<User>(ex.Message);
+
+            }
         }
     }
 }

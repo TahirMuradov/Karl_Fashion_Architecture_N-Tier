@@ -1,0 +1,471 @@
+﻿ 
+@model GetProductUIDTO 
+
+<!-- <<<<<<<<<<<<<<<<<<<< Breadcumb Area Start <<<<<<<<<<<<<<<<<<<< -->
+<div class="breadcumb_area">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <ol class="breadcrumb d-flex align-items-center">
+                    <li class="breadcrumb-item"><a href="#">Home</a></li>
+                    <li class="breadcrumb-item"><a href="#">Dresses</a></li>
+                    <li class="breadcrumb-item active">Long Dress</li>
+                </ol>
+                <!-- btn -->
+                <a asp-controller="shop" class="backToHome d-block"><i class="fa fa-angle-double-left"></i> Back to Shop</a>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- <<<<<<<<<<<<<<<<<<<< Breadcumb Area End <<<<<<<<<<<<<<<<<<<< -->
+<!-- <<<<<<<<<<<<<<<<<<<< Single Product Details Area Start >>>>>>>>>>>>>>>>>>>>>>>>> -->
+<section class="single_product_details_area section_padding_0_100">
+    <div class="container">
+        <div class="row">
+
+            <div class="col-12 col-md-6">
+                <div class="single_product_thumb">
+                    <div id="product_details_slider" class="carousel slide" data-ride="carousel">
+                        <ol class="carousel-indicators">
+                        @for (int i = 0; i < Model.PicturesUrls.Count; i++)
+                        {
+                            
+                            @if (i==0)
+                                {
+
+                                    <li class="active" data-target="#product_details_slider" data-slide-to="0" style="background-image: url('@Url.Content( Model.PicturesUrls[i])');">
+                                    </li>
+                                }
+                                else
+                                {
+                                <li data-target="#product_details_slider" data-slide-to="@i" style="background-image: url('@Url.Content(Model.PicturesUrls[i])');">
+                                </li>
+                                }
+
+                          }
+                           
+                        </ol>
+                       
+                        <div class="carousel-inner">
+                                @for (int i = 0; i < Model.PicturesUrls.Count; i++)
+                                {
+
+                            @if (i==0)
+                                {
+                                    
+                            <div class="carousel-item active">
+                                <a class="gallery_img" href="@Model.PicturesUrls[i]">
+                                            <img class="d-block w-100" src="@Model.PicturesUrls[i]" alt="slide Item">
+                                </a>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="carousel-item">
+                                        <a class="gallery_img" href="@Model.PicturesUrls[i]">
+                                            <img class="d-block w-100" src="@Model.PicturesUrls[i]" alt="slide Item">
+                                        </a>
+                                    </div>
+
+                                }
+                                }
+
+                        </div>
+                        
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6">
+                <div class="single_product_desc">
+
+                    <h4 class="title"><a href="#">@Model.ProductName</a></h4>
+
+                    
+                        @if (Model.DisCount==0)
+                        {
+                            
+                        <h4 class="price">
+
+                             <span>
+
+                                @Model.Price &#x20BC
+                            </span>
+                        </h4>
+                        }
+                        else
+                        {
+                            <span>
+                                <del>
+
+
+                                @Model.DisCount&#x20BC
+                            </del>
+                         
+                                </span>
+                        <span class="font-weight-bold">@Model.Price  &#x20BC</span>
+
+                    }
+                    
+
+                    <p class="available">Available: <span class="text-muted">In Stock</span></p>
+
+                    <!-- Add to Cart Form -->
+                    <form class="cart row" method="post" id="form_@Model.ProductID">
+
+                        <div class="widget size mb-50 col-12">
+                            <h6 class="widget-title">Size</h6>
+                            <div class="widget-desc">
+                                <ul>
+
+                                    @foreach (var size in Model.Product_Size)
+                                    {
+                                        @if (size.Value > 0)
+                                        {
+                                            <li>
+                                                <a id="sizeSelected_@Model.ProductID" onclick="SelectSize(this,@size.Key)" href="#">@size.Key</a>
+
+
+                                                <div id="quantity" class="quantity">
+
+                                                    <input size="@size.Key" onchange="SizeCountSelect(this,`@size.Key`,`@Model.ProductID`)" type="number" class="qty-text d-none" id="qty" step="1" min="0" max="@size.Value" name="quantity" value="0">
+
+                                                </div>
+                                            </li>
+                                        }
+                                        else
+                                        {
+                                            <li>
+                                                <s>@size.Key</s>
+                                                <div id="quantity" class="quantity">
+
+                                                    <input size="@size.Key" disabled type="number" class="qty-text d-none" id="qty" step="1" min="0" max="@size.Value" name="quantity" value="0">
+
+                                                </div>
+                                            </li>
+                                        }
+
+                                    }
+
+                                </ul>
+                            </div>
+                        </div>
+                        <a href="#" data-dismiss="modal" onclick="AddToCartProduct('@Model.ProductID')" name="addtocart" value="5" class="cart-submit" style="display: flex;justify-content: center; align-items: center;">Add to cart</a>
+
+                   
+
+                    </form>
+
+                    <div id="accordion" role="tablist">
+                        <div class="card">
+                            <div class="card-header" role="tab" id="headingOne">
+                                <h6 class="mb-0">
+                                    <a data-toggle="collapse" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">Information</a>
+                                </h6>
+                            </div>
+
+                            <div id="collapseOne" class="collapse show" role="tabpanel" aria-labelledby="headingOne" data-parent="#accordion">
+                                <div class="card-body">
+                                    <p>@Model.ProductDescription</p>
+                                   
+                                  
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- <<<<<<<<<<<<<<<<<<<< Single Product Details Area End >>>>>>>>>>>>>>>>>>>>>>>>> -->
+
+
+    
+<section class="you_may_like_area clearfix">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="section_heading text-center">
+                    <h2>related Products</h2>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="you_make_like_slider owl-carousel">
+                    @foreach (GetProductUIDTO product in ViewBag.RealetedProducts as List<GetProductUIDTO>)
+{
+                    <!-- Single gallery Item -->
+                    <div class="single_gallery_item">
+                        <!-- Product Image -->
+                        <div class="product-img">
+                            <img src="@product.PicturesUrls[0]" alt="">
+                            <div class="product-quicview">
+                                <a href="#" data-toggle="modal" data-target="#@product.ProductID"><i class="ti-plus"></i></a>
+                            </div>
+                        </div>
+                        <!-- Product Description -->
+                        <div class="product-description">
+                            <h4 class="product-price">
+
+                                @if (product.DisCount==0)
+                                    {
+                                        <span>@product.Price</span>
+
+                                    }
+                                    else
+                                    {
+                                       <del>@product.DisCount</del> <span>@product.Price</span>
+                                    }
+
+                            </h4>
+                            <p>@product.ProductDescription</p>
+                            <!-- Add to Cart -->
+                            @* <a href="#" class="add-to-cart-btn">ADD TO CART</a> *@
+                        </div>
+                    </div>
+
+                 
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+@foreach (GetProductUIDTO item in ViewBag.RealetedProducts as List<GetProductUIDTO>)
+{
+    <div class="modal fade" id="@item.ProductID" tabindex="-1" role="dialog" aria-labelledby="quickview" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <button type="button" class="close btn" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+
+                <div class="modal-body">
+                    <div class="quickview_body">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-12 col-lg-5">
+                                    <div class="quickview_pro_img">
+                                        <img src="@item.PicturesUrls[0]" alt="">
+                                    </div>
+                                </div>
+                                <div class="col-12 col-lg-7">
+                                    <div class="quickview_pro_des">
+                                        <h4 class="title">@item.ProductDescription</h4>
+                                        <div class="top_seller_product_rating mb-15">
+                                            <i class="fa fa-star" aria-hidden="true"></i>
+                                            <i class="fa fa-star" aria-hidden="true"></i>
+                                            <i class="fa fa-star" aria-hidden="true"></i>
+                                            <i class="fa fa-star" aria-hidden="true"></i>
+                                            <i class="fa fa-star" aria-hidden="true"></i>
+                                        </div>
+
+                                        @if (item.DisCount > 0)
+                                        {
+
+                                            <h5 class="price">
+                                                @item.DisCount &#x20BC
+                                                <span>@item.Price &#x20BC </span>
+                                            </h5>
+                                        }
+                                        else
+                                        {
+                                            <h5 class="price">
+                                                @item.Price &#x20BC
+                                            </h5>
+                                        }
+
+                                        <p>@item.ProductDescription</p>
+                                        <a asp-controller="ProductDetail" asp-action="index" asp-route-Id="@item.ProductID">View Full Product Details</a>
+                                    </div>
+
+                                    <!-- Add to Cart Form -->
+                                    <form class="cart row" method="post" id="form_@item.ProductID">
+
+                                        <div class="widget size mb-50 col-12">
+                                            <h6 class="widget-title">Size</h6>
+                                            <div class="widget-desc">
+                                                <ul>
+
+                                                    @foreach (var size in item.Product_Size)
+                                                    {
+                                                        @if (size.Value > 0)
+                                                        {
+                                                            <li>
+                                                                <a id="sizeSelected_@item.ProductID" onclick="SelectSize(this,@size.Key)" href="#">@size.Key</a>
+
+
+                                                                <div id="quantity" class="quantity">
+
+                                                                    <input size="@size.Key" onchange="SizeCountSelect(this,`@size.Key`,`@item.ProductID`)" type="number" class="qty-text d-none" id="qty" step="1" min="0" max="@size.Value" name="quantity" value="0">
+
+                                                                </div>
+                                                            </li>
+                                                        }
+                                                        else
+                                                        {
+                                                            <li>
+                                                                <s>@size.Key</s>
+                                                                <div id="quantity" class="quantity">
+
+                                                                    <input size="@size.Key" disabled type="number" class="qty-text d-none" id="qty" step="1" min="0" max="@size.Value" name="quantity" value="0">
+
+                                                                </div>
+                                                            </li>
+                                                        }
+
+                                                    }
+
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <a href="#" data-dismiss="modal" onclick="AddToCartProduct('@item.ProductID')" name="addtocart" value="5" class="cart-submit" style="display: flex;justify-content: center; align-items: center;">Add to cart</a>
+
+                                        <!-- Wishlist -->
+
+                                        <div class="modal_pro_wishlist">
+                                            <a href="wishlist.html" target="_blank"><i class="ti-heart"></i></a>
+                                        </div>
+
+                                    </form>
+
+                                    <div class="share_wf mt-30">
+                                        <p>Share With Friend</p>
+                                        <div class="_icon">
+                                            <a href="#"><i class="fa fa-facebook" aria-hidden="true"></i></a>
+                                            <a href="#"><i class="fa fa-twitter" aria-hidden="true"></i></a>
+                                            <a href="#"><i class="fa fa-pinterest" aria-hidden="true"></i></a>
+                                            <a href="#"><i class="fa fa-google-plus" aria-hidden="true"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ****** Quick View Modal Area End ****** -->
+}
+@section scripts{
+
+
+        <script>
+
+
+
+
+
+            function SizeCountSelect(e, size, id) {
+
+                var SizeTagValue = document.querySelectorAll(`#sizeSelected_${id}`);
+
+                SizeTagValue.forEach((item) => {
+                    if (item.innerHTML == size) {
+
+                        if (item.getAttribute("data-value") != null) {
+
+                            item.setAttribute("size-count", `${e.value}`)
+                        }
+                        if (item.getAttribute("size-count") == "0") {
+                            item.removeAttribute("size-count")
+                        }
+
+
+
+                    }
+                })
+
+            }
+        function SelectSize(e, size) {
+
+            if (e.getAttribute("data-value") == null) {
+
+                e.setAttribute("data-value", `${size}`)
+
+            }
+            else {
+                e.removeAttribute("data-value")
+                e.removeAttribute("size-count")
+                e.nextElementSibling.children[0].value = 0
+
+
+
+            }
+            e.classList.toggle("a_onclikc")
+            var input = document.querySelectorAll(".qty-text")
+
+            input.forEach((tag) => {
+
+                if (tag.getAttribute("size") == size) {
+                    tag.classList.toggle("d-none")
+                }
+            })
+
+
+        }
+        function AddToCartProduct(id) {
+
+            var size = document.querySelectorAll(`#sizeSelected_${id}`)
+            var sizeArry = [];
+            var input = document.querySelectorAll(".qty-text")
+            var a_onclick = document.querySelectorAll(".widget-desc ul li a.a_onclikc")
+            if (a_onclick) {
+                a_onclick.forEach((item) => {
+                    item.classList.remove("a_onclikc")
+                })
+            }
+
+            input.forEach((tag) => {
+
+                if (!tag.classList.contains("d-none")) {
+                    tag.classList.toggle("d-none")
+
+                }
+
+            })
+            size.forEach((tag) => {
+                if (tag.getAttribute("data-value") != null && tag.getAttribute("size-count") != 0) {
+
+                    sizeArry.push(tag.getAttribute("data-value"));
+                    sizeArry.push(tag.getAttribute("size-count"))
+                }
+            })
+
+
+
+
+
+            $.ajax({
+
+                url: `/addtocart/addtocart/${id}?size=${sizeArry}`,
+
+                success: function (jqxhr, txt_status, code) {
+                    console.log(jqxhr)
+                    console.log(txt_status)
+                    console.log(code.status)
+                    UpdateCartItem()
+                },
+                error: function (jqxhr, txt_status, code) {
+                    console.log(jqxhr)
+                    console.log(txt_status)
+                    console.log(code.status)
+
+                },
+
+
+            });
+
+
+
+        }
+    </script>
+
+
+}

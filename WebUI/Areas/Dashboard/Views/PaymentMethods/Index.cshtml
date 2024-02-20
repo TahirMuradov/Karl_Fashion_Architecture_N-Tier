@@ -1,0 +1,32 @@
+﻿@model List<GetPaymentMethodDTO>
+<a class="btn-outline-success" asp-area="dashboard" asp-controller="paymentmethods" asp-action="create">Create</a>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Id</th>
+            <th scope="col">Content</th>
+            <th scope="col">Api</th>
+            <th scope="col">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            var counter = 0;
+        }
+        @foreach (var Method in Model)
+        {
+            counter++;
+            <tr>
+            <th scope="row">@counter</th>
+            <td>@Method.Id</td>
+                <td>@Method.Content</td>
+                <td>@Method.Api</td
+                    <td><a class="btn-outline-danger" asp-area="dashboard" asp-controller="paymentmethod" asp-route-Id="@Method.Id">Delete</a></td>
+
+           
+        </tr>
+        }
+      
+    </tbody>
+</table>

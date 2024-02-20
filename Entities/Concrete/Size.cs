@@ -9,9 +9,11 @@ namespace Entities.Concrete
 {
     public class Size:BaseEntity,IEntity
     {
-      public int NumberSize { get; set; }
-   public int SizeStockCount { get; set; }
+      
+        public int NumberSize { get; set; }
+    
 
         public List<ProductSize> ProductSize { get; set; }
+
     }
 }
