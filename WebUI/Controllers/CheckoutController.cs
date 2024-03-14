@@ -1,5 +1,7 @@
 ﻿
 using Bussines.Abstract;
+using Core.Helper.EmailHelper;
+using Core.Helper.EmailHelper.Concrete;
 using Core.Helper.FileHelper;
 using Entities.Concrete;
 using Entities.DTOs.Cart;
@@ -20,18 +22,27 @@ namespace WebUI.Controllers
         private readonly IPaymentMethodServices _paymentMethodServices;
         private readonly IShippingMethodsServices _shippingMethodsServices;
         private readonly UserManager<User> _userManager;
+        private readonly IEmailHelper _emailHelper;
 
-        public CheckoutController(UserManager<User> userManager, IHttpContextAccessor contextAccessor, IPaymentMethodServices paymentMethodServices, IShippingMethodsServices shippingMethodsServices)
+        public CheckoutController(UserManager<User> userManager, IHttpContextAccessor contextAccessor, IPaymentMethodServices paymentMethodServices, IShippingMethodsServices shippingMethodsServices, IEmailHelper emailHelper)
         {
             _userManager = userManager;
             _contextAccessor = contextAccessor;
             _paymentMethodServices = paymentMethodServices;
             _shippingMethodsServices = shippingMethodsServices;
+            _emailHelper = emailHelper;
         }
 
         public IActionResult Index()
         {
-            var currentCulture=Thread.CurrentThread.CurrentCulture.Name;
+            string currentUserId=string.Empty;
+            if (User.Identity.IsAuthenticated)
+            {
+                
+             currentUserId = _contextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            }
+
+            var currentCulture =Thread.CurrentThread.CurrentCulture.Name;
             if (Request.Cookies["ShippingMethods"] is null)
             {
                 TempData["Error"] = "Catdirilma Novunu Secin!";
@@ -42,7 +53,6 @@ namespace WebUI.Controllers
             if (User.Identity.IsAuthenticated)
             {
                 
-            string currentUserId = _contextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
 
             var currentUser =_userManager.Users.FirstOrDefault(x=>x.Id==currentUserId);
             
@@ -64,8 +74,16 @@ namespace WebUI.Controllers
             return View();
         }
         [HttpPost]
-        public IActionResult Index(ShippingMethodAndUserInfoDTO OrderInfo)
+        public async Task<IActionResult> Index(ShippingMethodAndUserInfoDTO OrderInfo)
         {
+            string currentUserId=string.Empty;
+            if (User.Identity.IsAuthenticated)
+            {
+                
+             currentUserId = _contextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            }
+
+
             var currentCulture = Thread.CurrentThread.CurrentCulture.Name;
             if (Request.Cookies["ShippingMethods"] is null)
             {
@@ -77,7 +95,6 @@ namespace WebUI.Controllers
             if (User.Identity.IsAuthenticated)
             {
 
-                string currentUserId = _contextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
 
                 var currentUser = _userManager.Users.FirstOrDefault(x => x.Id == currentUserId);
 
@@ -93,11 +110,11 @@ namespace WebUI.Controllers
 
             
             var shipping = JsonSerializer.Deserialize<GetShippingMethodDTO>(Request.Cookies["ShippingMethods"]);
-            var ChecekShipping= _shippingMethodsServices.GetShipping(shipping.Id, currentCulture);
+            var ChecekShipping= _shippingMethodsServices.GetShipping(shipping.Id, currentCulture).Data;
             ViewBag.ShippingMethod = ChecekShipping;
             ViewBag.CartItems = cartItems;
             ViewBag.PaymentMethods = _paymentMethodServices.GetAllPaymentMethod(currentCulture).Data;
-            var checkedPaymentMethod=_paymentMethodServices.GetPaymentMethod(OrderInfo.PaymentsMethodId, currentCulture);
+            var checkedPaymentMethod=_paymentMethodServices.GetPaymentMethod(OrderInfo.PaymentsMethodId, currentCulture).Data;
             if (!ModelState.IsValid)
             {
                
@@ -115,23 +132,40 @@ namespace WebUI.Controllers
               size=int.Parse( x.Size)
             }));
 
-            //FileHelper.SaveOrderPdf(
-            //    productInPDF,
-            //    new ShippingMethodInOrderPdfDTO
-            //    {
-            //        Id = ChecekShipping.Data.Id,
-            //        Price = ChecekShipping.Data.Price,
-            //        ShippingContent = ChecekShipping.Data.Content
+         string pdfPath=   FileHelper.SaveOrderPdf(
+                productInPDF,
+                new ShippingMethodInOrderPdfDTO
+                {
+                    Id = ChecekShipping.Id,
+                    Price = ChecekShipping.Price,
+                    ShippingContent = ChecekShipping.Content
 
 
-            //    },
-            //    new PaymentMethodInOrderPdfDTO
-            //    {
-            //        Id = checkedPaymentMethod.Data.Id,
-            //        Content = checkedPaymentMethod.Data.Content,
-            //    }
-            //    );
-          
+                },
+                new PaymentMethodInOrderPdfDTO
+                {
+                    Id = checkedPaymentMethod.Id,
+                    Content = checkedPaymentMethod.Content,
+                }
+                );
+            if (pdfPath is not null)
+            {
+                var currentUser=await _userManager.FindByIdAsync(currentUserId);
+                if (currentUser != null)
+                {
+
+                await _emailHelper.SendEmailPdfAsync(currentUser.Email, currentUser.UserName, pdfPath);
+                }
+                else
+                {
+                   await _emailHelper.SendEmailPdfAsync(OrderInfo.Email, OrderInfo.FirstName+OrderInfo.LastName, pdfPath);
+
+                }
+
+            }
+
+
+
 
 
             return Redirect("/home/index");

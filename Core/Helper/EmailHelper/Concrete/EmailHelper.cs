@@ -51,6 +51,49 @@ namespace Core.Helper.EmailHelper.Concrete
 
         }
 
+        public async Task<IResult> SendEmailPdfAsync(string userEmail, string UserName,string pdfPath)
+        {
 
+
+            var email = new MimeMessage();
+            email.From.Add(new MailboxAddress ("Muradov Tahir", _config["EmailServices:FromEmail"]));
+            email.To.Add(new MailboxAddress(UserName,userEmail));
+            email.Importance = MessageImportance.High;
+            email.Subject = "Elektron Poct Tesdiqleme";
+
+           
+
+            var attachment = new MimePart("application", "pdf")
+            {
+                Content = new MimeContent(File.OpenRead(pdfPath)),
+                ContentDisposition = new ContentDisposition(ContentDisposition.Attachment),
+                ContentTransferEncoding = ContentEncoding.Base64,
+                FileName = Path.GetFileName(pdfPath)
+            };
+
+            var multipart = new Multipart("mixed");
+            multipart.Add(attachment);
+            email.Body = multipart;
+
+            try
+            {
+                using (var smtp = new SmtpClient())
+                {
+
+                    await smtp.ConnectAsync(_config["EmailServices:ServiceName"], Convert.ToInt32(_config["EmailServices:ServicePort"]), MailKit.Security.SecureSocketOptions.StartTls);
+                    await smtp.AuthenticateAsync(_config["EmailServices:FromEmail"], _config["EmailServices:FromEmailPassword"]);
+                    await smtp.SendAsync(email);
+                    await smtp.DisconnectAsync(true);
+                }
+
+
+                return new SuccessResult("Email Gonderilirdi");
+            }
+            catch (Exception ex)
+            {
+                return new ErrorResult(ex.Message);
+                // log exception
+            }
+        }
     }
 }

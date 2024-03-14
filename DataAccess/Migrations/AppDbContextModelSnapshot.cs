@@ -17,7 +17,7 @@ namespace DataAccess.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.0")
+                .HasAnnotation("ProductVersion", "8.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -239,6 +239,26 @@ namespace DataAccess.Migrations
                     b.HasIndex("PaymentMehtodId");
 
                     b.ToTable("PaymentMethodsLaunge");
+                });
+
+            modelBuilder.Entity("Entities.Concrete.Picture", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("url")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("Pictures");
                 });
 
             modelBuilder.Entity("Entities.Concrete.ProductSize", b =>
@@ -477,10 +497,6 @@ namespace DataAccess.Migrations
 
                     b.Property<decimal>("DisCount")
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("PicturesUrls")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
@@ -781,6 +797,17 @@ namespace DataAccess.Migrations
                     b.Navigation("PaymentMethod");
                 });
 
+            modelBuilder.Entity("Entities.Concrete.Picture", b =>
+                {
+                    b.HasOne("Entities.Product", "Product")
+                        .WithMany("Pictures")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("Entities.Concrete.ProductSize", b =>
                 {
                     b.HasOne("Entities.Product", "Product")
@@ -957,6 +984,8 @@ namespace DataAccess.Migrations
             modelBuilder.Entity("Entities.Product", b =>
                 {
                     b.Navigation("OrderProducts");
+
+                    b.Navigation("Pictures");
 
                     b.Navigation("ProductCategories");
 

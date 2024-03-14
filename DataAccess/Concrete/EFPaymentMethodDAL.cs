@@ -93,16 +93,19 @@ namespace DataAccess.Concrete
 
         public IDataResult<GetPaymentMethodDTO> GetPaymentMethod(string Id, string langCode)
         {
-           GetPaymentMethodDTO result;
+            GetPaymentMethodDTO result;
             using (var context = new AppDbContext())
             {
-                PaymentMethod paymentMethod = context.PaymentMethods.Include(x => x.PaymentMethodLaunguages.FirstOrDefault(x => x.LangCode == langCode)).FirstOrDefault(x => x.Id.ToString() == Id);
-            result= new GetPaymentMethodDTO {
-                Id=paymentMethod.Id.ToString()
-                , Api = paymentMethod.Api
-                , Content = paymentMethod.PaymentMethodLaunguages[0].Content };
+                var paymentMethod = context.PaymentMethods.Include(x => x.PaymentMethodLaunguages).FirstOrDefault(x => x.Id.ToString() == Id).PaymentMethodLaunguages.FirstOrDefault(y => y.LangCode == langCode);
+                result = new GetPaymentMethodDTO
+                {
+                    Id = paymentMethod.PaymentMehtodId.ToString(),
+                    Content = paymentMethod.Content,
+                    Api = paymentMethod.PaymentMethod.Api,
+
+                };
+                return new SuccessDataResult<GetPaymentMethodDTO>(result);
             }
-            return new SuccessDataResult<GetPaymentMethodDTO>(result);
         }
     }
 }

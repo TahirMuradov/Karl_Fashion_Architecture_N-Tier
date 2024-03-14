@@ -1,0 +1,6 @@
+@Karl_FashionAPI_HostAddress = http://localhost:5155
+
+GET {{Karl_FashionAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

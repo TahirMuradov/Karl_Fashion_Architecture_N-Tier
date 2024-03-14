@@ -9,6 +9,8 @@ namespace Core.Helper.EmailHelper
 {
     public interface IEmailHelper
     {
-        Task<IResult> SendEmailAsync(string userEmail, string confirmationLink, string UserName);
+      public  Task<IResult> SendEmailAsync(string userEmail, string confirmationLink, string UserName);
+    
+        public Task<IResult> SendEmailPdfAsync(string userEmail, string UserName, string pdfLink);
     }
 }

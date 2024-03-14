@@ -28,7 +28,7 @@ namespace Entities.DTOs.CheckOutDTOs
         /// Gets or sets the phone number. Must not be empty and should adhere to the specified format.
         /// </summary>
         [Required(ErrorMessage = "Phone Number cannot be empty")]
-        [RegularExpression("^(?!0+$)(\\+\\d{1,3}[- ]?)?(?!0+$)\\d{10,15}$", ErrorMessage = "Invalid phone number format")]
+        //[RegularExpression("^(?!0+$)(\\+\\d{1,3}[- ]?)?(?!0+$)\\d{10,15}$", ErrorMessage = "Invalid phone number format")]
         public string PhoneNumber { get; set; }
 
         /// <summary>

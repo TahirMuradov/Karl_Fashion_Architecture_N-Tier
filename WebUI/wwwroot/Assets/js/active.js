@@ -582,15 +582,15 @@ function CheckedCokkieItem(callback) {
         url: "addtocart/checkedcartiteminfo",
         type: "GET",
     }).done(function (data) {
-        // Ajax çağrısı başarıyla tamamlandığında callback fonksiyonunu çağırarak işlem yapabilirsiniz.
+
         callback(null, data);
     }).fail(function (jqXHR, textStatus, errorThrown) {
-        // Hata durumunda callback fonksiyonunu çağırarak hatayı iletebilirsiniz.
+        
         callback(textStatus, null);
     });
 }
 
-// Kullanım örneği:
+
 
 
 $("input[name='shippingMethod']").on("click", function (e) {
@@ -639,4 +639,87 @@ $("input[name='shippingMethod']").on("click", function (e) {
  
   
 });
+//14.4 modal js
+function SizeCountSelect(e, size, id) {
+
+    var SizeTagValue = document.querySelectorAll(`#sizeSelected_${id}`);
+
+    SizeTagValue.forEach((item) => {
+        if (item.innerHTML == size) {
+         
+            if (item.getAttribute("data-value") != null) {
+
+                item.setAttribute("size-count", `${e.value}`)
+            }
+            if (item.getAttribute("size-count") == "0") {
+                item.removeAttribute("size-count")
+            }
+
+
+
+        }
+    })
+
+}
+function SelectSize(e, size) {
+   
+    if (e.getAttribute("data-value") == null) {
+     
+        e.setAttribute("data-value", `${size}`)
+    }
+    else {
+        e.removeAttribute("data-value")
+    }
+    e.classList.toggle("a_onclikc")
+    var input = document.querySelectorAll(".qty-text")
+
+    input.forEach((tag) => {
+
+        if (tag.getAttribute("size") == size) {
+            tag.classList.toggle("d-none")
+        }
+    })
+
+
+}
+function ProductModal(id) {
+
+    var size = document.querySelectorAll(`#sizeSelected_${id}`)
+    var sizeArry = [];
+
+    size.forEach((tag) => {
+        if (tag.getAttribute("data-value") != null && tag.getAttribute("size-count") != 0) {
+
+            sizeArry.push(tag.getAttribute("data-value"));
+            sizeArry.push(tag.getAttribute("size-count"))
+        }
+    })
+
+
+
+
+
+    $.ajax({
+
+        url: `/addtocart/addtocart/${id}?size=${sizeArry}`,
+
+        success: function (jqxhr, txt_status, code) {
+            console.log(jqxhr)
+            console.log(txt_status)
+            console.log(code.status)
+            UpdateCartItem()
+        },
+        error: function (jqxhr, txt_status, code) {
+            console.log(jqxhr)
+            console.log(txt_status)
+            console.log(code.status)
+
+        },
+
+
+    });
+
+
+
+}
 

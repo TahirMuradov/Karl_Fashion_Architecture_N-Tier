@@ -114,7 +114,11 @@
                         <div class="row">
                             <div class="col-12 col-lg-5">
                                 <div class="quickview_pro_img">
-                                    <img src="@item.PicturesUrls[0]" alt="">
+                                        @if (item.PicturesUrls.Count != 0 )
+                                        {
+
+                                            <img src="@item.PicturesUrls[0]" alt="">
+                                        }
                                 </div>
                             </div>
                             <div class="col-12 col-lg-7">
@@ -251,8 +255,12 @@
                 <div class="col-12 col-sm-6 col-md-4 single_gallery_item @string.Join(" ", product.Product_Category) wow fadeInUpBig" data-wow-delay="0.2s">
                         <!-- Product Image -->
                         <div class="product-img">
+                        @if (product.PicturesUrls.Count!=0)
+                        {
+                            
                             <img src="@product.PicturesUrls[0]" alt="">
-                            <div class="product-quicview">
+                        }
+                            <div class="product-quicview" style="cursor:pointer;">
                                 <a  data-toggle="modal" data-target="#@product.ProductID"><i class="ti-plus"></i></a>
                             </div>
                         </div>
@@ -260,8 +268,7 @@
                         <div class="product-description">
                         <h4 class="product-price">@product.Price &#x20BC</h4>
                             <p>@product.ProductName</p>
-                            <!-- Add to Cart -->
-                            <a href="#" class="add-to-cart-btn">ADD TO CART</a>
+                          
                         </div>
                     </div>
 
@@ -362,88 +369,7 @@
         @section scripts{
 
         <script>
-        function SizeCountSelect(e,size,id){
-
-        var SizeTagValue = document.querySelectorAll(`#sizeSelected_${id}`);
-       
-SizeTagValue.forEach((item)=>{
-            if (item.innerHTML==size) {
-                debugger;
-        if (item.getAttribute("data-value") != null) {
-                       
-            item.setAttribute("size-count", `${e.value}`)
-        }
-                    if (item.getAttribute("size-count") == "0") {
-                        item.removeAttribute("size-count")
-                    }
         
-        
-      
-    }
-})
-       
-        }
-        function SelectSize(e,size){
-            debugger;
-        if (e.getAttribute("data-value")==null) {
-            debugger
-            e.setAttribute("data-value", `${size}`)
-            }
-            else{
-            e.removeAttribute("data-value")
-            }
-                e.classList.toggle("a_onclikc")
-            var input = document.querySelectorAll(".qty-text")
-
-              input.forEach((tag)=>{
-             
-                if (tag.getAttribute("size")==size) {
-                    tag.classList.toggle("d-none")
-                }
-              })
-     
-           
-    }
-        function ProductModal(id) {
-
-        var size = document.querySelectorAll(`#sizeSelected_${id}`)
-            var sizeArry = [];
-       
-            size.forEach((tag) => {
-            if (tag.getAttribute("data-value")!=null && tag.getAttribute("size-count")!=0) {
-                
-                sizeArry.push(tag.getAttribute("data-value"));
-                    sizeArry.push(tag.getAttribute("size-count"))
-                }
-            })
-       
-
-       
-     
-        
-                $.ajax({
-                    
-                url: `/addtocart/addtocart/${id}?size=${sizeArry}`,
-               
-                success: function (jqxhr, txt_status,code) {
-                    console.log(jqxhr)
-                    console.log(txt_status)
-                    console.log(code.status)
-                   UpdateCartItem()
-                    },
-                error: function (jqxhr, txt_status,code) {
-                    console.log(jqxhr)
-                    console.log(txt_status)
-                    console.log(code.status)
-                   
-                },
-                        
-                    
-            });
-        
-         
-
-        }
     </script>
         }
      

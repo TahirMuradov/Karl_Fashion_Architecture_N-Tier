@@ -167,7 +167,7 @@ namespace WebUI.Areas.Dashboard.Controllers
                 ProductCode = product.ProductCode,
                 DisCount = product.DisCount,
                 Price = product.Price,
-                PicturesUrls=product.PicturesUrls,
+                PicturesUrls=product.Pictures.Select(x=>x.url).ToList(),
                 ProductDescrption=product.productLanguages.Select(x=>x.Description).ToList(),
                 ProductName=product.productLanguages.Select(x=>x.ProductName).ToList(),
                 CategoryId=product.ProductCategories.Select(x=>x.CategoryId).ToList(),

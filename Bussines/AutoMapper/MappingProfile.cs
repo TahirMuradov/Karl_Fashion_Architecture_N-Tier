@@ -18,7 +18,7 @@ namespace Bussines.AutoMapper
                 .ForMember(dest => dest.ProductID, opt => opt.MapFrom(src => src.Id))
             .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.productLanguages.Select(x => x.ProductName).FirstOrDefault()))
             .ForMember(dest => dest.ProductDescription, opt => opt.MapFrom(src => src.productLanguages.Select(x => x.Description).FirstOrDefault()))
-            .ForMember(dest => dest.PicturesUrls, opt => opt.MapFrom(src => src.PicturesUrls))
+            .ForMember(dest => dest.PicturesUrls, opt => opt.MapFrom(src => src.Pictures.Select(x=>x.url)))
             .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.Price))
             .ForMember(dest => dest.DisCount, opt => opt.MapFrom(src => src.DisCount))
             .ForMember(dest => dest.Color, opt => opt.MapFrom(src => src.Color))

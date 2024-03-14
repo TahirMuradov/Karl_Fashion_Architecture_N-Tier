@@ -31,29 +31,31 @@ namespace Bussines.DependencyResolver
             services.AddScoped<IShippingMethodsServices, ShippingMethodManager>();
             services.AddScoped<IPaymentMethodDAL, EFPaymentMethodDAL>();
             services.AddScoped<IPaymentMethodServices, PaymentMethodManager>();
+            services.AddScoped<IPictureDAL, EFPictureDAL>();
+            services.AddScoped<IPictureServices, PictureManager>();
             
 
-            services.Configure<IdentityOptions>(opts =>
-            {
-                opts.SignIn.RequireConfirmedEmail = true;
-            });
+            //services.Configure<IdentityOptions>(opts =>
+            //{
+            //    opts.SignIn.RequireConfirmedEmail = true;
+            //});
         
-            services.Configure<IdentityOptions>(options =>
-            {
-                options.SignIn.RequireConfirmedEmail = false;
+            //services.Configure<IdentityOptions>(options =>
+            //{
+            //    options.SignIn.RequireConfirmedEmail = false;
                 
-                // Default Password settings.
-                options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+/ ";
-                options.Password.RequireDigit = false;
-                options.Password.RequireLowercase = false;
-                options.Password.RequireNonAlphanumeric = false;
-                options.Password.RequireUppercase = false;
-                options.Password.RequiredLength = 3;
-                options.Password.RequiredUniqueChars = 1;
-                options.Lockout.MaxFailedAccessAttempts = 5;
-                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+            //    // Default Password settings.
+            //    options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+/ ";
+            //    options.Password.RequireDigit = false;
+            //    options.Password.RequireLowercase = false;
+            //    options.Password.RequireNonAlphanumeric = false;
+            //    options.Password.RequireUppercase = false;
+            //    options.Password.RequiredLength = 3;
+            //    options.Password.RequiredUniqueChars = 1;
+            //    options.Lockout.MaxFailedAccessAttempts = 5;
+            //    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
                 
-            });
+            //});
             var mapperConfig = new MapperConfiguration(mc =>
             {
                 mc.AddProfile(new MappingProfile());

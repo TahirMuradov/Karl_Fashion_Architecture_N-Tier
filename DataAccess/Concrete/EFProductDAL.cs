@@ -33,6 +33,7 @@ namespace DataAccess.Concrete
             {
                 var context = new AppDbContext();
 
+
                 Product product = new Product()
                 {
                     ProductCode = ProductAddDTO.ProductCode,
@@ -40,7 +41,7 @@ namespace DataAccess.Concrete
                     DisCount = 0,
                     CreatedDate = DateTime.Now,
                     Color = ProductAddDTO.Color,
-                    PicturesUrls = ProductAddDTO.PhotoUrl,
+                    
                     UserId = ProductAddDTO.UserId,
                     isFeatured = ProductAddDTO.isFeatured
 
@@ -49,6 +50,12 @@ namespace DataAccess.Concrete
 
                 };
                 await context.Products.AddAsync(product);
+
+                Picture picture = new Picture()
+                {
+                
+                
+                };
                 await context.SaveChangesAsync();
                 for (int i = 0; i < ProductAddDTO.ProductName.Count; i++)
                 {
@@ -163,7 +170,7 @@ namespace DataAccess.Concrete
                     DisCount = x.DisCount,
                     ProductPrice = x.Price,
                     ProductCode = x.ProductCode,
-                    ImgUrls = x.PicturesUrls,
+                    ImgUrls = x.Pictures.Select(x=>x.url).ToList(),
                     ProductId = x.Id.ToString(),
                     categoryName = x.ProductCategories
          .Where(pc => pc.Category.CategoryLanguages.Any(cl => cl.LangCode == "az"))
@@ -196,6 +203,7 @@ namespace DataAccess.Concrete
                     .ThenInclude(x => x.ProductCategories)
                     .ThenInclude(x => x.Category)
                     .ThenInclude(x => x.CategoryLanguages)
+                    .Include(x=>x.Product.Pictures)
                     .Include(x => x.Product.ProductSizes)
                     .ThenInclude(x => x.Size)
                     .ToList();
@@ -277,9 +285,9 @@ namespace DataAccess.Concrete
                         Color = ProductAdmin[0].Product.Color,
                         DisCount = ProductAdmin[0].Product.DisCount,
                         Price = ProductAdmin[0].Product.Price,
-                        PicturesUrls = ProductAdmin[0].Product.PicturesUrls,
+                        PicturesUrls = ProductAdmin[0].Product.Pictures.Select(x => x.url).ToList(),
                         ProductCode = ProductAdmin[0].Product.productLanguages.FirstOrDefault().Product.ProductCode,
-                     
+                     ProductDescription= ProductAdmin[0].Product.productLanguages.FirstOrDefault().Description,
                         ProductName = ProductAdmin[0].Product.productLanguages.FirstOrDefault().ProductName,
                         Product_Category = ProductAdmin[0].Product.ProductCategories.Select(x => x.Category.CategoryLanguages.FirstOrDefault(x => x.LangCode == langCode).CategoryName).ToList(),
                         Product_Size = ProductAdmin[0].Product.ProductSizes.ToDictionary(x => x.Size.NumberSize, x => x.SizeStockCount)
@@ -302,6 +310,7 @@ namespace DataAccess.Concrete
                     .Include(a => a.productLanguages.Where(x => x.LangCode == LangCode))
                    .Include(a => a.ProductSizes)
                     .ThenInclude(a => a.Size)
+                     .Include(x => x.Pictures)
                     .Include(a => a.User)
                     .Include(a => a.ProductCategories)
                     .ThenInclude(a => a.Category)
@@ -313,6 +322,7 @@ namespace DataAccess.Concrete
                     .Include(a => a.productLanguages.Where(x => x.LangCode == LangCode))
                    .Include(a => a.ProductSizes)
                     .ThenInclude(a => a.Size)
+                    .Include(x=>x.Pictures)
                     .Include(a => a.User)
                     .Include(a => a.ProductCategories)
                     .ThenInclude(a => a.Category)
@@ -332,7 +342,7 @@ namespace DataAccess.Concrete
                        Color = ProductAdmin[i].Color,
                        DisCount = ProductAdmin[i].DisCount,
                        Price = ProductAdmin[i].Price,
-                       PicturesUrls = ProductAdmin[i].PicturesUrls,
+                       PicturesUrls = ProductAdmin[i].Pictures.Select(x => x.url).ToList(),
                        ProductCode = ProductAdmin[i].productLanguages.FirstOrDefault(x => x.LangCode == LangCode).Product.ProductCode,
                        ProductName = ProductAdmin[i].productLanguages.FirstOrDefault(x => x.LangCode == LangCode).ProductName,
                        Product_Category = ProductAdmin[i].ProductCategories.Select(x => x.Category.CategoryLanguages.FirstOrDefault(x => x.LangCode == LangCode)?.CategoryName).ToList(),
@@ -359,6 +369,7 @@ namespace DataAccess.Concrete
    .Include(a => a.productLanguages.Where(x => x.LangCode == currentCulture))
                    .Include(a => a.ProductSizes)
                     .ThenInclude(a => a.Size)
+                    .Include(x=>x.Pictures)
                     .Include(a => a.User)
                     .Include(a => a.ProductCategories)
                     .ThenInclude(a => a.Category)
@@ -447,7 +458,7 @@ namespace DataAccess.Concrete
                                    Color = products[i].Color,
                                    DisCount = products[i].DisCount,
                                    Price = products[i].Price,
-                                   PicturesUrls = products[i].PicturesUrls,
+                                   PicturesUrls = products[i].Pictures.Select(x => x.url).ToList(),
                                    ProductCode = products[i].productLanguages.FirstOrDefault(x => x.LangCode == currentCulture).Product.ProductCode,
                                    ProductName = products[i].productLanguages.FirstOrDefault(x => x.LangCode == currentCulture).ProductName,
                                    Product_Category = products[i].ProductCategories.Select(x => x.Category.CategoryLanguages.FirstOrDefault(x => x.LangCode == currentCulture)?.CategoryName).ToList(),
@@ -634,7 +645,8 @@ namespace DataAccess.Concrete
                     .ThenInclude(x => x.Size)
                     .FirstOrDefault(x => x.Id == productRemoveDTO.ProductId);
                 ;
-                bool PhotoRemoveResult = product.PicturesUrls.RemoveFileRange();
+                var PhotoRemove = product.Pictures.Select(x => x.url).ToList();
+            bool PhotoRemoveResult=    FileHelper.RemoveFileRange(PhotoRemove);
                 if (PhotoRemoveResult)
                 {
                     context.Remove(product);
@@ -720,11 +732,20 @@ namespace DataAccess.Concrete
                 }
 
                 context.SaveChanges();
-
+                foreach (string url in productUpdateDTO.PicturesUrls)
+                {
+                    Picture picture = new Picture()
+                    {
+                        ProductId= productUpdateDTO.Id,
+                        url=url
+                    };
+                    context.Pictures.Add(picture);
+                }
+                context.SaveChanges();
                 Product.Price = productUpdateDTO.Price;
                 Product.DisCount = productUpdateDTO.DisCount;
                 Product.ProductCode = productUpdateDTO.ProductCode;
-                Product.PicturesUrls = productUpdateDTO.PicturesUrls;
+                //Product.Pictures = productUpdateDTO.PicturesUrls;
                 Product.Color = productUpdateDTO.Color;
                 Product.UpdatedDate = DateTime.Now;
                 Product.UpdatedUserId = productUpdateDTO.UpdatedUserId;
@@ -809,7 +830,7 @@ namespace DataAccess.Concrete
                             Color = item.Product.Color,
                             DisCount = item.Product.DisCount,
                             Price = item.Product.Price,
-                            PicturesUrls = item.Product.PicturesUrls,
+                            PicturesUrls = item.Product.Pictures.Select(x=>x.url).ToList(),
                                 ProductCode = item.Product.productLanguages.FirstOrDefault()?.Product.ProductCode,
                                 ProductDescription = item.Product.productLanguages.FirstOrDefault()?.Description,
                             ProductName = item.Product.productLanguages.FirstOrDefault()?.ProductName,
