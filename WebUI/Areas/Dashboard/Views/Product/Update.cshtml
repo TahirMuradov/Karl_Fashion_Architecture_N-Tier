@@ -157,19 +157,27 @@
 
     </div>
     <div class="form-group">
-        <label for="Photo"></label>
-        <input type="file" multiple accept="image/*" value="" id="File" name="File" class="form-control-file" />
+     
         @* <input type="text" value="" /> *@
-
-        <div class="d-flex flex-wrap" id="img_box">
-          @foreach (var item in Model.PicturesUrls)
+        <div class="form-group" id="form-file">
+            <label for="Photo"></label>
+            <input type="file" multiple accept="image/*" value="" id="photo" name="Photo" class="form-control-file" />
+            @foreach (string photoUrl in Model.PicturesUrls)
             {
-                <div id="@item" class="col-2 position-relative">
-                    <img src="@item"  for="file" id="file" class="img-fluid rounded-1" />
-                    <input type="hidden" value="@item" asp-for="PicturesUrls" />
-                    <span onclick="RemovedPhoto('@item')"  style="z-index:1; left:3%;" class="position-absolute btn-danger"><i style="color:red;cursor:pointer;" class="fa-solid fa-circle-xmark"></i></span>
+                <div class="d-flex flex-wrap text-center" id="@photoUrl" currentPhoto="true">
+
+                    <input type="hidden" value="@photoUrl" asp-for="PicturesUrls" />
+                    <img src="@photoUrl" for="photo" id="photo" name="Photo" style="width: 200px;" alt="" />
+
+                    <button type="button" onclick="currentPhotoDelete('@photoUrl')" class="btn btn-outline-danger "><i class="fas fa-trash"></i></button>
+
+
+
                 </div>
+
             }
+
+
         </div>
 
     </div>
@@ -181,27 +189,54 @@
 </form>
 @section scripts {
     <script>
-        $("#File").change(function () {
-     
-            console.log($("#img_box"))
-            $("#img_box").children("#new").remove();
-            $.each(this.files, function (index, file) {
-                $("#img_box").append(`
-                <div class="col-2" id="new">
+    function currentPhotoDelete(id) {
+        let element = document.getElementById(id);
+        element.remove();
+    }
+    function PhotoDelete(photoName) {
+        console.log(photoName)
+        let fileInput = document.getElementById("photo");
+        var updatedFiles = fileInput.files;
 
-                  <img  src="${URL.createObjectURL(file)}" for="photo" id="photo" name="Photo" class="img-fluid rounded-1" alt="" />
-               
+        var newFileList = new DataTransfer();
 
-                          </div>`);
+        for (var j = 0; j < updatedFiles.length; j++) {
+            if (updatedFiles[j].name !== photoName) {
+                newFileList.items.add(updatedFiles[j]);
+            }
+        }
 
-            });
+        fileInput.files = newFileList.files;
+        var img_box = document.getElementById(photoName);
+      
+        img_box.remove();
+
+
+    }
+
+    $("#photo").change(function () {
+        $(".d-flex[currentPhoto='false']").remove();
+
+        $.each(this.files, function (index, file) {
+
+            $("#form-file").append(`
+
+
+
+                           <div class="d-flex flex-wrap text-center" id="${file.name}" currentPhoto='false'>
+
+
+                                 <img  src="${URL.createObjectURL(file)}" for="photo" id="photo" name="Photo" style="width: 200px;"  alt="" />
+
+                        <button type="button" onclick="PhotoDelete('${file.name}')" class="btn btn-outline-danger "><i class="fas fa-trash"></i></button>
+
+
+
+                </div>
+
+                 `);
         });
-        function    RemovedPhoto(id){
-       
-            // $("#img_box").children("#" + id).remove();
-         document.getElementById(id).remove()
-              }
-
+    });
     // </script>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script> <!-- jQuery'nin doğru sürümünü veya bağlantıyı kullanmaya dikkat edin -->
 

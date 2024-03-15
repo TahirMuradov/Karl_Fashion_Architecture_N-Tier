@@ -3,6 +3,7 @@ using Core.Utilities.Results.Abstract;
 using DataAccess.Abstract;
 using Entities;
 using Entities.DTOs.ProductDTOs;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,9 +22,9 @@ namespace Bussines.Concrete
             _productDAL = productDAL;
         }
 
-        public async Task< IResult> AddProductAsync(ProductAddDTO productAddDTO)
+        public async Task< IResult> AddProductAsync(ProductAddDTO productAddDTO,List<IFormFile> Photos)
         {
-           return await _productDAL.AddProductAsync(productAddDTO);
+           return await _productDAL.AddProductAsync(productAddDTO,Photos);
         }
 
         public IDataResult<Product> GetProduct(Expression<Func<Product, bool>>? expression=null)

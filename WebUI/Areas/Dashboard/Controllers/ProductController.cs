@@ -98,16 +98,9 @@ namespace WebUI.Areas.Dashboard.Controllers
                 ModelState.AddModelError("Error", "Mehsul Sekli Elave Edin");
                 return View();
             }
-            List<string>PhotoUrls = new List<string>();
-
-            foreach (var photo in Photo)
-            {
-                
-                PhotoUrls.Add(await FileHelper.SaveFileAsync(photo,_env.WebRootPath) );
-            }
-            productAddDTO.PhotoUrl = PhotoUrls;
+          
             productAddDTO.UserId=currentUserId;
-    var result=     await _productServices.AddProductAsync(productAddDTO);
+    var result=     await _productServices.AddProductAsync(productAddDTO,Photo);
             if (!result.IsSuccess)
           return View(result.Message);
             return RedirectToAction("Index");
@@ -184,7 +177,7 @@ namespace WebUI.Areas.Dashboard.Controllers
             return View(productUpdateDTO);
         }
         [HttpPost]
-        public async Task<IActionResult> Update (ProductUpdateDTO productUpdateDTO ,List<IFormFile> File)
+        public async Task<IActionResult> Update (ProductUpdateDTO productUpdateDTO ,List<IFormFile> Photo)
         {
 
 
@@ -201,12 +194,12 @@ namespace WebUI.Areas.Dashboard.Controllers
                 TempData["ErrorMessage"] = "Product adı ve ya Prodcut Description  dil kodu saylari uygun deyil veya sıfırdan kiçik.";
                 return RedirectToAction("Update");
             }
-            if (File is null)
+            if (Photo is null)
             {
                 TempData["ErrorMessage"] = "Mehsul Sekli Elave Edin";
                 return RedirectToAction("Update");
             }
-            foreach (IFormFile file in File)
+            foreach (IFormFile file in Photo)
             {
                
                 productUpdateDTO.PicturesUrls.Add(await FileHelper.SaveFileAsync(file, _env.WebRootPath));

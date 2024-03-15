@@ -11,8 +11,9 @@ using DataAccess.Concrete.SQLserver;
 using Entities;
 using Entities.Concrete;
 using Entities.DTOs.ProductDTOs;
-using Microsoft.Data.SqlClient;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using System.Drawing;
 using System.Linq.Expressions;
 
@@ -27,7 +28,7 @@ namespace DataAccess.Concrete
             _map = map;
         }
 
-        public async Task<IResult> AddProductAsync(ProductAddDTO ProductAddDTO)
+        public async Task<IResult> AddProductAsync(ProductAddDTO ProductAddDTO, List<IFormFile> Photos)
         {
             try
             {
@@ -41,7 +42,7 @@ namespace DataAccess.Concrete
                     DisCount = 0,
                     CreatedDate = DateTime.Now,
                     Color = ProductAddDTO.Color,
-                    
+
                     UserId = ProductAddDTO.UserId,
                     isFeatured = ProductAddDTO.isFeatured
 
@@ -51,11 +52,20 @@ namespace DataAccess.Concrete
                 };
                 await context.Products.AddAsync(product);
 
-                Picture picture = new Picture()
+
+                foreach (var photo in Photos)
                 {
-                
-                
-                };
+                    string url = await FileHelper.SaveFileAsync(photo, wwwrootGetPath.GetwwwrootPath);
+                    Picture picture = new Picture()
+                    {
+                        ProductId = product.Id,
+                        Product = product,
+                        url = url
+                    };
+                    context.Pictures.Add(picture);
+
+                }
+
                 await context.SaveChangesAsync();
                 for (int i = 0; i < ProductAddDTO.ProductName.Count; i++)
                 {
@@ -134,6 +144,7 @@ namespace DataAccess.Concrete
                       .Include(a => a.productLanguages)
                        .Include(a => a.ProductSizes)
                        .ThenInclude(a => a.Size)
+                       .Include(x=>x.Pictures)
                        .Include(a => a.User)
                        .Include(a => a.ProductCategories)
                        .ThenInclude(a => a.Category)
@@ -160,6 +171,7 @@ namespace DataAccess.Concrete
                     .Include(a => a.ProductSizes)
                     .ThenInclude(a => a.Size)
                     .Include(a => a.User)
+                    .Include(x=>x.Pictures)
                     .Include(a => a.ProductCategories)
                     .ThenInclude(a => a.Category)
                     .ThenInclude(a => a.CategoryLanguages).ToList();
@@ -170,7 +182,7 @@ namespace DataAccess.Concrete
                     DisCount = x.DisCount,
                     ProductPrice = x.Price,
                     ProductCode = x.ProductCode,
-                    ImgUrls = x.Pictures.Select(x=>x.url).ToList(),
+                    ImgUrls = x.Pictures.Select(x => x.url).ToList(),
                     ProductId = x.Id.ToString(),
                     categoryName = x.ProductCategories
          .Where(pc => pc.Category.CategoryLanguages.Any(cl => cl.LangCode == "az"))
@@ -203,7 +215,7 @@ namespace DataAccess.Concrete
                     .ThenInclude(x => x.ProductCategories)
                     .ThenInclude(x => x.Category)
                     .ThenInclude(x => x.CategoryLanguages)
-                    .Include(x=>x.Product.Pictures)
+                    .Include(x => x.Product.Pictures)
                     .Include(x => x.Product.ProductSizes)
                     .ThenInclude(x => x.Size)
                     .ToList();
@@ -287,7 +299,7 @@ namespace DataAccess.Concrete
                         Price = ProductAdmin[0].Product.Price,
                         PicturesUrls = ProductAdmin[0].Product.Pictures.Select(x => x.url).ToList(),
                         ProductCode = ProductAdmin[0].Product.productLanguages.FirstOrDefault().Product.ProductCode,
-                     ProductDescription= ProductAdmin[0].Product.productLanguages.FirstOrDefault().Description,
+                        ProductDescription = ProductAdmin[0].Product.productLanguages.FirstOrDefault().Description,
                         ProductName = ProductAdmin[0].Product.productLanguages.FirstOrDefault().ProductName,
                         Product_Category = ProductAdmin[0].Product.ProductCategories.Select(x => x.Category.CategoryLanguages.FirstOrDefault(x => x.LangCode == langCode).CategoryName).ToList(),
                         Product_Size = ProductAdmin[0].Product.ProductSizes.ToDictionary(x => x.Size.NumberSize, x => x.SizeStockCount)
@@ -322,7 +334,7 @@ namespace DataAccess.Concrete
                     .Include(a => a.productLanguages.Where(x => x.LangCode == LangCode))
                    .Include(a => a.ProductSizes)
                     .ThenInclude(a => a.Size)
-                    .Include(x=>x.Pictures)
+                    .Include(x => x.Pictures)
                     .Include(a => a.User)
                     .Include(a => a.ProductCategories)
                     .ThenInclude(a => a.Category)
@@ -369,7 +381,7 @@ namespace DataAccess.Concrete
    .Include(a => a.productLanguages.Where(x => x.LangCode == currentCulture))
                    .Include(a => a.ProductSizes)
                     .ThenInclude(a => a.Size)
-                    .Include(x=>x.Pictures)
+                    .Include(x => x.Pictures)
                     .Include(a => a.User)
                     .Include(a => a.ProductCategories)
                     .ThenInclude(a => a.Category)
@@ -405,50 +417,50 @@ namespace DataAccess.Concrete
                             {
                                 a++;
                             }
-                            if (j == 2 
-                                
+                            if (j == 2
+
                                 )
                             {
                                 if (products[i].ProductSizes.Any(x => x.Size.NumberSize == int.Parse(size)
                                  && x.SizeStockCount > 0))
                                 {
-                                    
-                                a++;
+
+                                    a++;
                                 }
 
                             }
-                            if (j == 3 )
-                              
+                            if (j == 3)
+
                             {
                                 if ((products[i].DisCount == 0 ?
                                   products[i].Price >= decimal.Parse(minPrice) :
                                   products[i].DisCount >= decimal.Parse(minPrice))
                                 )
                                 {
-                                    
-                                a++;
+
+                                    a++;
                                 }
 
                             }
 
 
-                            if (j==4)
+                            if (j == 4)
                             {
                                 if (products[i].DisCount == 0 ?
                                   products[i].Price <= decimal.Parse(maxPrice) :
                                   products[i].DisCount <= decimal.Parse(maxPrice))
                                 {
-                                    
-                                a++;
+
+                                    a++;
                                 }
                             }
-                      
+
 
                         }
 
 
                     }
-                    if (a==isNotNullParametrCounter)
+                    if (a == isNotNullParametrCounter)
                     {
 
                         result.Add(
@@ -470,152 +482,152 @@ namespace DataAccess.Concrete
                 }
 
                 //1 serti odeyen mehsulu elave edir asagdaki alqoritm
-/*
-                for (int i = 0; i < products.Count; i++)
-                {
-                    ;
-                    if (category is not null &&
-                        products[i].ProductCategories.Where(x => x.Category.CategoryLanguages.Any(x => x.LangCode == currentCulture && x.CategoryName == category)).ToList().Count != 0
-                        &&
-                        !result.Any(x => x.ProductID == products[i].Id)
-                        )
-                    {
+                /*
+                                for (int i = 0; i < products.Count; i++)
+                                {
+                                    ;
+                                    if (category is not null &&
+                                        products[i].ProductCategories.Where(x => x.Category.CategoryLanguages.Any(x => x.LangCode == currentCulture && x.CategoryName == category)).ToList().Count != 0
+                                        &&
+                                        !result.Any(x => x.ProductID == products[i].Id)
+                                        )
+                                    {
 
-                        result.Add(
-                            new GetProductUIDTO
-                            {
-                                ProductID = products[i].Id,
-                                Color = products[i].Color,
-                                DisCount = products[i].DisCount,
-                                Price = products[i].Price,
-                                PicturesUrls = products[i].PicturesUrls,
-                                ProductDescription = products[i].productLanguages.FirstOrDefault(x => x.LangCode == currentCulture).Description,
-                                ProductName = products[i].productLanguages.FirstOrDefault(x => x.LangCode == currentCulture).ProductName,
-                                Product_Category = products[i].ProductCategories.Select(x => x.Category.CategoryLanguages.FirstOrDefault(x => x.LangCode == currentCulture)?.CategoryName).ToList(),
-                                Product_Size = products[i].ProductSizes.ToDictionary(x => x.Size.NumberSize, x => x.SizeStockCount)
-                            }
-                                 );
-                    }
-                    if (color is not null &&
-                        products[i].Color == color
-                        &&
-                       !result.Any(x => x.ProductID == products[i].Id))
-                    {
-                        result.Add(
-                    new GetProductUIDTO
-                    {
-                        ProductID = products[i].Id,
-                        Color = products[i].Color,
-                        DisCount = products[i].DisCount,
-                        Price = products[i].Price,
-                        PicturesUrls = products[i].PicturesUrls,
-                        ProductDescription = products[i].productLanguages.FirstOrDefault(x => x.LangCode == currentCulture).Description,
-                        ProductName = products[i].productLanguages.FirstOrDefault(x => x.LangCode == currentCulture).ProductName,
-                        Product_Category = products[i].ProductCategories.Select(x => x.Category.CategoryLanguages.FirstOrDefault(x => x.LangCode == currentCulture)?.CategoryName).ToList(),
-                        Product_Size = products[i].ProductSizes.ToDictionary(x => x.Size.NumberSize, x => x.SizeStockCount)
-                    }
-                         );
-                    }
-                    if (size is not null &&
-                  products[i].ProductSizes.Any(x => x.Size.NumberSize == int.Parse(size) && x.SizeStockCount > 0)
-                  &&
-                 !result.Any(x => x.ProductID == products[i].Id))
-                    {
-                        result.Add(
-                    new GetProductUIDTO
-                    {
-                        ProductID = products[i].Id,
-                        Color = products[i].Color,
-                        DisCount = products[i].DisCount,
-                        Price = products[i].Price,
-                        PicturesUrls = products[i].PicturesUrls,
-                        ProductDescription = products[i].productLanguages.FirstOrDefault(x => x.LangCode == currentCulture).Description,
-                        ProductName = products[i].productLanguages.FirstOrDefault(x => x.LangCode == currentCulture).ProductName,
-                        Product_Category = products[i].ProductCategories.Select(x => x.Category.CategoryLanguages.FirstOrDefault(x => x.LangCode == currentCulture)?.CategoryName).ToList(),
-                        Product_Size = products[i].ProductSizes.ToDictionary(x => x.Size.NumberSize, x => x.SizeStockCount)
-                    }
-                         );
-                    }
-                    if (minPrice is not null && maxPrice is null &&
-                  (products[i].DisCount == 0 ? products[i].Price >= decimal.Parse(minPrice) : products[i].DisCount >= decimal.Parse(minPrice))
-                  &&
-                 !result.Any(x => x.ProductID == products[i].Id))
-                    {
-                        result.Add(
-                    new GetProductUIDTO
-                    {
-                        ProductID = products[i].Id,
-                        Color = products[i].Color,
-                        DisCount = products[i].DisCount,
-                        Price = products[i].Price,
-                        PicturesUrls = products[i].PicturesUrls,
-                        ProductDescription = products[i].productLanguages.FirstOrDefault(x => x.LangCode == currentCulture).Description,
-                        ProductName = products[i].productLanguages.FirstOrDefault(x => x.LangCode == currentCulture).ProductName,
-                        Product_Category = products[i].ProductCategories.Select(x => x.Category.CategoryLanguages.FirstOrDefault(x => x.LangCode == currentCulture)?.CategoryName).ToList(),
-                        Product_Size = products[i].ProductSizes.ToDictionary(x => x.Size.NumberSize, x => x.SizeStockCount)
-                    }
-                         );
-                    }
+                                        result.Add(
+                                            new GetProductUIDTO
+                                            {
+                                                ProductID = products[i].Id,
+                                                Color = products[i].Color,
+                                                DisCount = products[i].DisCount,
+                                                Price = products[i].Price,
+                                                PicturesUrls = products[i].PicturesUrls,
+                                                ProductDescription = products[i].productLanguages.FirstOrDefault(x => x.LangCode == currentCulture).Description,
+                                                ProductName = products[i].productLanguages.FirstOrDefault(x => x.LangCode == currentCulture).ProductName,
+                                                Product_Category = products[i].ProductCategories.Select(x => x.Category.CategoryLanguages.FirstOrDefault(x => x.LangCode == currentCulture)?.CategoryName).ToList(),
+                                                Product_Size = products[i].ProductSizes.ToDictionary(x => x.Size.NumberSize, x => x.SizeStockCount)
+                                            }
+                                                 );
+                                    }
+                                    if (color is not null &&
+                                        products[i].Color == color
+                                        &&
+                                       !result.Any(x => x.ProductID == products[i].Id))
+                                    {
+                                        result.Add(
+                                    new GetProductUIDTO
+                                    {
+                                        ProductID = products[i].Id,
+                                        Color = products[i].Color,
+                                        DisCount = products[i].DisCount,
+                                        Price = products[i].Price,
+                                        PicturesUrls = products[i].PicturesUrls,
+                                        ProductDescription = products[i].productLanguages.FirstOrDefault(x => x.LangCode == currentCulture).Description,
+                                        ProductName = products[i].productLanguages.FirstOrDefault(x => x.LangCode == currentCulture).ProductName,
+                                        Product_Category = products[i].ProductCategories.Select(x => x.Category.CategoryLanguages.FirstOrDefault(x => x.LangCode == currentCulture)?.CategoryName).ToList(),
+                                        Product_Size = products[i].ProductSizes.ToDictionary(x => x.Size.NumberSize, x => x.SizeStockCount)
+                                    }
+                                         );
+                                    }
+                                    if (size is not null &&
+                                  products[i].ProductSizes.Any(x => x.Size.NumberSize == int.Parse(size) && x.SizeStockCount > 0)
+                                  &&
+                                 !result.Any(x => x.ProductID == products[i].Id))
+                                    {
+                                        result.Add(
+                                    new GetProductUIDTO
+                                    {
+                                        ProductID = products[i].Id,
+                                        Color = products[i].Color,
+                                        DisCount = products[i].DisCount,
+                                        Price = products[i].Price,
+                                        PicturesUrls = products[i].PicturesUrls,
+                                        ProductDescription = products[i].productLanguages.FirstOrDefault(x => x.LangCode == currentCulture).Description,
+                                        ProductName = products[i].productLanguages.FirstOrDefault(x => x.LangCode == currentCulture).ProductName,
+                                        Product_Category = products[i].ProductCategories.Select(x => x.Category.CategoryLanguages.FirstOrDefault(x => x.LangCode == currentCulture)?.CategoryName).ToList(),
+                                        Product_Size = products[i].ProductSizes.ToDictionary(x => x.Size.NumberSize, x => x.SizeStockCount)
+                                    }
+                                         );
+                                    }
+                                    if (minPrice is not null && maxPrice is null &&
+                                  (products[i].DisCount == 0 ? products[i].Price >= decimal.Parse(minPrice) : products[i].DisCount >= decimal.Parse(minPrice))
+                                  &&
+                                 !result.Any(x => x.ProductID == products[i].Id))
+                                    {
+                                        result.Add(
+                                    new GetProductUIDTO
+                                    {
+                                        ProductID = products[i].Id,
+                                        Color = products[i].Color,
+                                        DisCount = products[i].DisCount,
+                                        Price = products[i].Price,
+                                        PicturesUrls = products[i].PicturesUrls,
+                                        ProductDescription = products[i].productLanguages.FirstOrDefault(x => x.LangCode == currentCulture).Description,
+                                        ProductName = products[i].productLanguages.FirstOrDefault(x => x.LangCode == currentCulture).ProductName,
+                                        Product_Category = products[i].ProductCategories.Select(x => x.Category.CategoryLanguages.FirstOrDefault(x => x.LangCode == currentCulture)?.CategoryName).ToList(),
+                                        Product_Size = products[i].ProductSizes.ToDictionary(x => x.Size.NumberSize, x => x.SizeStockCount)
+                                    }
+                                         );
+                                    }
 
-                    if (minPrice is not null && maxPrice is not null &&
-                    (products[i].DisCount == 0 ? products[i].Price >= decimal.Parse(minPrice) && products[i].Price <= decimal.Parse(maxPrice) : products[i].DisCount >= decimal.Parse(minPrice) && products[i].DisCount <= decimal.Parse(maxPrice))
-                    &&
-                   !result.Any(x => x.ProductID == products[i].Id))
-                    {
-                        result.Add(
-                    new GetProductUIDTO
-                    {
-                        ProductID = products[i].Id,
-                        Color = products[i].Color,
-                        DisCount = products[i].DisCount,
-                        Price = products[i].Price,
-                        PicturesUrls = products[i].PicturesUrls,
-                        ProductDescription = products[i].productLanguages.FirstOrDefault(x => x.LangCode == currentCulture).Description,
-                        ProductName = products[i].productLanguages.FirstOrDefault(x => x.LangCode == currentCulture).ProductName,
-                        Product_Category = products[i].ProductCategories.Select(x => x.Category.CategoryLanguages.FirstOrDefault(x => x.LangCode == currentCulture)?.CategoryName).ToList(),
-                        Product_Size = products[i].ProductSizes.ToDictionary(x => x.Size.NumberSize, x => x.SizeStockCount)
-                    }
-                         );
-                    }
-                    if (minPrice is null && maxPrice is not null &&
-                       (products[i].DisCount == 0 ? products[i].Price < decimal.Parse(maxPrice) : products[i].Price < decimal.Parse(maxPrice))
-                       &&
-                      !result.Any(x => x.ProductID == products[i].Id))
-                    {
-                        result.Add(
-                    new GetProductUIDTO
-                    {
-                        ProductID = products[i].Id,
-                        Color = products[i].Color,
-                        DisCount = products[i].DisCount,
-                        Price = products[i].Price,
-                        PicturesUrls = products[i].PicturesUrls,
-                        ProductDescription = products[i].productLanguages.FirstOrDefault(x => x.LangCode == currentCulture).Description,
-                        ProductName = products[i].productLanguages.FirstOrDefault(x => x.LangCode == currentCulture).ProductName,
-                        Product_Category = products[i].ProductCategories.Select(x => x.Category.CategoryLanguages.FirstOrDefault(x => x.LangCode == currentCulture)?.CategoryName).ToList(),
-                        Product_Size = products[i].ProductSizes.ToDictionary(x => x.Size.NumberSize, x => x.SizeStockCount)
-                    }
-                         );
-                    }
+                                    if (minPrice is not null && maxPrice is not null &&
+                                    (products[i].DisCount == 0 ? products[i].Price >= decimal.Parse(minPrice) && products[i].Price <= decimal.Parse(maxPrice) : products[i].DisCount >= decimal.Parse(minPrice) && products[i].DisCount <= decimal.Parse(maxPrice))
+                                    &&
+                                   !result.Any(x => x.ProductID == products[i].Id))
+                                    {
+                                        result.Add(
+                                    new GetProductUIDTO
+                                    {
+                                        ProductID = products[i].Id,
+                                        Color = products[i].Color,
+                                        DisCount = products[i].DisCount,
+                                        Price = products[i].Price,
+                                        PicturesUrls = products[i].PicturesUrls,
+                                        ProductDescription = products[i].productLanguages.FirstOrDefault(x => x.LangCode == currentCulture).Description,
+                                        ProductName = products[i].productLanguages.FirstOrDefault(x => x.LangCode == currentCulture).ProductName,
+                                        Product_Category = products[i].ProductCategories.Select(x => x.Category.CategoryLanguages.FirstOrDefault(x => x.LangCode == currentCulture)?.CategoryName).ToList(),
+                                        Product_Size = products[i].ProductSizes.ToDictionary(x => x.Size.NumberSize, x => x.SizeStockCount)
+                                    }
+                                         );
+                                    }
+                                    if (minPrice is null && maxPrice is not null &&
+                                       (products[i].DisCount == 0 ? products[i].Price < decimal.Parse(maxPrice) : products[i].Price < decimal.Parse(maxPrice))
+                                       &&
+                                      !result.Any(x => x.ProductID == products[i].Id))
+                                    {
+                                        result.Add(
+                                    new GetProductUIDTO
+                                    {
+                                        ProductID = products[i].Id,
+                                        Color = products[i].Color,
+                                        DisCount = products[i].DisCount,
+                                        Price = products[i].Price,
+                                        PicturesUrls = products[i].PicturesUrls,
+                                        ProductDescription = products[i].productLanguages.FirstOrDefault(x => x.LangCode == currentCulture).Description,
+                                        ProductName = products[i].productLanguages.FirstOrDefault(x => x.LangCode == currentCulture).ProductName,
+                                        Product_Category = products[i].ProductCategories.Select(x => x.Category.CategoryLanguages.FirstOrDefault(x => x.LangCode == currentCulture)?.CategoryName).ToList(),
+                                        Product_Size = products[i].ProductSizes.ToDictionary(x => x.Size.NumberSize, x => x.SizeStockCount)
+                                    }
+                                         );
+                                    }
 
-                    if (category is null && color is null && size is null && minPrice is null && maxPrice is null)
-                    {
-                        result.Add(
-                    new GetProductUIDTO
-                    {
-                        ProductID = products[i].Id,
-                        Color = products[i].Color,
-                        DisCount = products[i].DisCount,
-                        Price = products[i].Price,
-                        PicturesUrls = products[i].PicturesUrls,
-                        ProductDescription = products[i].productLanguages.FirstOrDefault(x => x.LangCode == currentCulture).Description,
-                        ProductName = products[i].productLanguages.FirstOrDefault(x => x.LangCode == currentCulture).ProductName,
-                        Product_Category = products[i].ProductCategories.Select(x => x.Category.CategoryLanguages.FirstOrDefault(x => x.LangCode == currentCulture)?.CategoryName).ToList(),
-                        Product_Size = products[i].ProductSizes.ToDictionary(x => x.Size.NumberSize, x => x.SizeStockCount)
-                    }
-                         );
-                    }
-                }*/
+                                    if (category is null && color is null && size is null && minPrice is null && maxPrice is null)
+                                    {
+                                        result.Add(
+                                    new GetProductUIDTO
+                                    {
+                                        ProductID = products[i].Id,
+                                        Color = products[i].Color,
+                                        DisCount = products[i].DisCount,
+                                        Price = products[i].Price,
+                                        PicturesUrls = products[i].PicturesUrls,
+                                        ProductDescription = products[i].productLanguages.FirstOrDefault(x => x.LangCode == currentCulture).Description,
+                                        ProductName = products[i].productLanguages.FirstOrDefault(x => x.LangCode == currentCulture).ProductName,
+                                        Product_Category = products[i].ProductCategories.Select(x => x.Category.CategoryLanguages.FirstOrDefault(x => x.LangCode == currentCulture)?.CategoryName).ToList(),
+                                        Product_Size = products[i].ProductSizes.ToDictionary(x => x.Size.NumberSize, x => x.SizeStockCount)
+                                    }
+                                         );
+                                    }
+                                }*/
 
 
 
@@ -641,15 +653,17 @@ namespace DataAccess.Concrete
                     .Include(x => x.productLanguages)
                     .Include(x => x.ProductCategories)
                     .ThenInclude(x => x.Category)
+                    .Include(x=>x.Pictures)
                     .Include(x => x.ProductSizes)
                     .ThenInclude(x => x.Size)
                     .FirstOrDefault(x => x.Id == productRemoveDTO.ProductId);
                 ;
                 var PhotoRemove = product.Pictures.Select(x => x.url).ToList();
-            bool PhotoRemoveResult=    FileHelper.RemoveFileRange(PhotoRemove);
+                bool PhotoRemoveResult = FileHelper.RemoveFileRange(PhotoRemove);
+                context.Products.Remove(product);
                 if (PhotoRemoveResult)
                 {
-                    context.Remove(product);
+                    context.Pictures.RemoveRange(product.Pictures);
                     context.SaveChanges();
                     return new SuccessResult("Silindi");
 
@@ -674,6 +688,7 @@ namespace DataAccess.Concrete
                     .Include(a => a.ProductSizes)
                     .ThenInclude(a => a.Size)
                     .Include(a => a.User)
+                    .Include(x=>x.Pictures)
                     .Include(a => a.ProductCategories)
                     .ThenInclude(a => a.Category)
                     .ThenInclude(a => a.CategoryLanguages)
@@ -734,10 +749,15 @@ namespace DataAccess.Concrete
                 context.SaveChanges();
                 foreach (string url in productUpdateDTO.PicturesUrls)
                 {
+                    if (Product.Pictures.Any(x=>x.url==url))
+                    {
+                        continue;
+
+                    }
                     Picture picture = new Picture()
                     {
-                        ProductId= productUpdateDTO.Id,
-                        url=url
+                        ProductId = productUpdateDTO.Id,
+                        url = url
                     };
                     context.Pictures.Add(picture);
                 }
@@ -830,9 +850,9 @@ namespace DataAccess.Concrete
                             Color = item.Product.Color,
                             DisCount = item.Product.DisCount,
                             Price = item.Product.Price,
-                            PicturesUrls = item.Product.Pictures.Select(x=>x.url).ToList(),
-                                ProductCode = item.Product.productLanguages.FirstOrDefault()?.Product.ProductCode,
-                                ProductDescription = item.Product.productLanguages.FirstOrDefault()?.Description,
+                            PicturesUrls = item.Product.Pictures.Select(x => x.url).ToList(),
+                            ProductCode = item.Product.productLanguages.FirstOrDefault()?.Product.ProductCode,
+                            ProductDescription = item.Product.productLanguages.FirstOrDefault()?.Description,
                             ProductName = item.Product.productLanguages.FirstOrDefault()?.ProductName,
                             Product_Category = item.Product.ProductCategories
                                 .Select(x => x.Category.CategoryLanguages

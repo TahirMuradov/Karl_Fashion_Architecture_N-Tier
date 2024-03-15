@@ -3,13 +3,14 @@ using Core.Utilities.Results.Abstract;
 using Entities;
 using Entities.DTOs.CategoryDTOs;
 using Entities.DTOs.ProductDTOs;
+using Microsoft.AspNetCore.Http;
 using System.Linq.Expressions;
 
 namespace DataAccess.Abstract
 {
     public interface IProductDAL:IRepositoryBase<Product>
     {
-        Task<IResult> AddProductAsync(ProductAddDTO ProductAddDTO);
+        Task<IResult> AddProductAsync(ProductAddDTO ProductAddDTO,List<IFormFile> Photos);
         IDataResult<List<ProductGetAdminListDTO>> GetProductAdminList();
         IDataResult<Product>GetProduct(Expression<Func<Product, bool>> expression);
       IDataResult<GetProductUIDTO>GetProductDetailUI(string id,string langCode);
