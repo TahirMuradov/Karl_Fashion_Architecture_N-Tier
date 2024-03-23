@@ -160,7 +160,7 @@ namespace WebUI.Areas.Dashboard.Controllers
                 ProductCode = product.ProductCode,
                 DisCount = product.DisCount,
                 Price = product.Price,
-                PicturesUrls=product.Pictures.Select(x=>x.url).ToList(),
+                PicturesUrls=product.Pictures,
                 ProductDescrption=product.productLanguages.Select(x=>x.Description).ToList(),
                 ProductName=product.productLanguages.Select(x=>x.ProductName).ToList(),
                 CategoryId=product.ProductCategories.Select(x=>x.CategoryId).ToList(),
@@ -194,7 +194,7 @@ namespace WebUI.Areas.Dashboard.Controllers
                 TempData["ErrorMessage"] = "Product adı ve ya Prodcut Description  dil kodu saylari uygun deyil veya sıfırdan kiçik.";
                 return RedirectToAction("Update");
             }
-            if (Photo is null)
+            if (Photo is null&& productUpdateDTO.PicturesUrls.Count==0)
             {
                 TempData["ErrorMessage"] = "Mehsul Sekli Elave Edin";
                 return RedirectToAction("Update");

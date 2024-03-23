@@ -31,7 +31,7 @@ namespace DataAccess.Concrete.SQLserver
         public DbSet<Item> SoldProducts { get; set; }
         public DbSet<Product>Products { get; set; }
         public DbSet<ProductLanguages> ProductLanguages { get; set; }
-        public DbSet<Picture> Pictures { get; set; }
+
 
         public DbSet<Size> Sizes { get; set; }
      

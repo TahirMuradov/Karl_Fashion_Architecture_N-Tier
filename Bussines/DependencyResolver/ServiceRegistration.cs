@@ -31,8 +31,7 @@ namespace Bussines.DependencyResolver
             services.AddScoped<IShippingMethodsServices, ShippingMethodManager>();
             services.AddScoped<IPaymentMethodDAL, EFPaymentMethodDAL>();
             services.AddScoped<IPaymentMethodServices, PaymentMethodManager>();
-            services.AddScoped<IPictureDAL, EFPictureDAL>();
-            services.AddScoped<IPictureServices, PictureManager>();
+     
             
 
             //services.Configure<IdentityOptions>(opts =>

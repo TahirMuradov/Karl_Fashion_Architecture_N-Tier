@@ -166,7 +166,7 @@ namespace WebUI.Controllers
 
 
 
-
+            Response.Cookies.Delete("cart");
 
             return Redirect("/home/index");
         }

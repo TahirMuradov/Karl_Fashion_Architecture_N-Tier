@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-
 using Core.DataAccess.EntityFramework;
 using Core.Helper;
 using Core.Helper.FileHelper;
@@ -13,7 +12,7 @@ using Entities.Concrete;
 using Entities.DTOs.ProductDTOs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
+
 using System.Drawing;
 using System.Linq.Expressions;
 
@@ -42,7 +41,7 @@ namespace DataAccess.Concrete
                     DisCount = 0,
                     CreatedDate = DateTime.Now,
                     Color = ProductAddDTO.Color,
-
+                   
                     UserId = ProductAddDTO.UserId,
                     isFeatured = ProductAddDTO.isFeatured
 
@@ -50,21 +49,12 @@ namespace DataAccess.Concrete
 
 
                 };
+                   List<string> url = await FileHelper.SaveFileRangeAsync(Photos, wwwrootGetPath.GetwwwrootPath);
+
+
+                product.Pictures = url;
                 await context.Products.AddAsync(product);
 
-
-                foreach (var photo in Photos)
-                {
-                    string url = await FileHelper.SaveFileAsync(photo, wwwrootGetPath.GetwwwrootPath);
-                    Picture picture = new Picture()
-                    {
-                        ProductId = product.Id,
-                        Product = product,
-                        url = url
-                    };
-                    context.Pictures.Add(picture);
-
-                }
 
                 await context.SaveChangesAsync();
                 for (int i = 0; i < ProductAddDTO.ProductName.Count; i++)
@@ -144,7 +134,7 @@ namespace DataAccess.Concrete
                       .Include(a => a.productLanguages)
                        .Include(a => a.ProductSizes)
                        .ThenInclude(a => a.Size)
-                       .Include(x=>x.Pictures)
+                      
                        .Include(a => a.User)
                        .Include(a => a.ProductCategories)
                        .ThenInclude(a => a.Category)
@@ -171,7 +161,7 @@ namespace DataAccess.Concrete
                     .Include(a => a.ProductSizes)
                     .ThenInclude(a => a.Size)
                     .Include(a => a.User)
-                    .Include(x=>x.Pictures)
+                  
                     .Include(a => a.ProductCategories)
                     .ThenInclude(a => a.Category)
                     .ThenInclude(a => a.CategoryLanguages).ToList();
@@ -182,7 +172,7 @@ namespace DataAccess.Concrete
                     DisCount = x.DisCount,
                     ProductPrice = x.Price,
                     ProductCode = x.ProductCode,
-                    ImgUrls = x.Pictures.Select(x => x.url).ToList(),
+                    ImgUrls = x.Pictures,
                     ProductId = x.Id.ToString(),
                     categoryName = x.ProductCategories
          .Where(pc => pc.Category.CategoryLanguages.Any(cl => cl.LangCode == "az"))
@@ -215,7 +205,7 @@ namespace DataAccess.Concrete
                     .ThenInclude(x => x.ProductCategories)
                     .ThenInclude(x => x.Category)
                     .ThenInclude(x => x.CategoryLanguages)
-                    .Include(x => x.Product.Pictures)
+                 
                     .Include(x => x.Product.ProductSizes)
                     .ThenInclude(x => x.Size)
                     .ToList();
@@ -297,7 +287,7 @@ namespace DataAccess.Concrete
                         Color = ProductAdmin[0].Product.Color,
                         DisCount = ProductAdmin[0].Product.DisCount,
                         Price = ProductAdmin[0].Product.Price,
-                        PicturesUrls = ProductAdmin[0].Product.Pictures.Select(x => x.url).ToList(),
+                        PicturesUrls = ProductAdmin[0].Product.Pictures,
                         ProductCode = ProductAdmin[0].Product.productLanguages.FirstOrDefault().Product.ProductCode,
                         ProductDescription = ProductAdmin[0].Product.productLanguages.FirstOrDefault().Description,
                         ProductName = ProductAdmin[0].Product.productLanguages.FirstOrDefault().ProductName,
@@ -322,7 +312,7 @@ namespace DataAccess.Concrete
                     .Include(a => a.productLanguages.Where(x => x.LangCode == LangCode))
                    .Include(a => a.ProductSizes)
                     .ThenInclude(a => a.Size)
-                     .Include(x => x.Pictures)
+
                     .Include(a => a.User)
                     .Include(a => a.ProductCategories)
                     .ThenInclude(a => a.Category)
@@ -334,7 +324,7 @@ namespace DataAccess.Concrete
                     .Include(a => a.productLanguages.Where(x => x.LangCode == LangCode))
                    .Include(a => a.ProductSizes)
                     .ThenInclude(a => a.Size)
-                    .Include(x => x.Pictures)
+                
                     .Include(a => a.User)
                     .Include(a => a.ProductCategories)
                     .ThenInclude(a => a.Category)
@@ -354,7 +344,7 @@ namespace DataAccess.Concrete
                        Color = ProductAdmin[i].Color,
                        DisCount = ProductAdmin[i].DisCount,
                        Price = ProductAdmin[i].Price,
-                       PicturesUrls = ProductAdmin[i].Pictures.Select(x => x.url).ToList(),
+                       PicturesUrls = ProductAdmin[i].Pictures,
                        ProductCode = ProductAdmin[i].productLanguages.FirstOrDefault(x => x.LangCode == LangCode).Product.ProductCode,
                        ProductName = ProductAdmin[i].productLanguages.FirstOrDefault(x => x.LangCode == LangCode).ProductName,
                        Product_Category = ProductAdmin[i].ProductCategories.Select(x => x.Category.CategoryLanguages.FirstOrDefault(x => x.LangCode == LangCode)?.CategoryName).ToList(),
@@ -470,7 +460,7 @@ namespace DataAccess.Concrete
                                    Color = products[i].Color,
                                    DisCount = products[i].DisCount,
                                    Price = products[i].Price,
-                                   PicturesUrls = products[i].Pictures.Select(x => x.url).ToList(),
+                                   PicturesUrls = products[i].Pictures,
                                    ProductCode = products[i].productLanguages.FirstOrDefault(x => x.LangCode == currentCulture).Product.ProductCode,
                                    ProductName = products[i].productLanguages.FirstOrDefault(x => x.LangCode == currentCulture).ProductName,
                                    Product_Category = products[i].ProductCategories.Select(x => x.Category.CategoryLanguages.FirstOrDefault(x => x.LangCode == currentCulture)?.CategoryName).ToList(),
@@ -653,24 +643,19 @@ namespace DataAccess.Concrete
                     .Include(x => x.productLanguages)
                     .Include(x => x.ProductCategories)
                     .ThenInclude(x => x.Category)
-                    .Include(x=>x.Pictures)
+                 
                     .Include(x => x.ProductSizes)
                     .ThenInclude(x => x.Size)
                     .FirstOrDefault(x => x.Id == productRemoveDTO.ProductId);
                 ;
-                var PhotoRemove = product.Pictures.Select(x => x.url).ToList();
+                var PhotoRemove = product.Pictures;
                 bool PhotoRemoveResult = FileHelper.RemoveFileRange(PhotoRemove);
                 context.Products.Remove(product);
-                if (PhotoRemoveResult)
-                {
-                    context.Pictures.RemoveRange(product.Pictures);
-                    context.SaveChanges();
-                    return new SuccessResult("Silindi");
+                context.SaveChanges();
 
-                }
-                else
-                    return new ErrorDataResult<ProductRemoveDTO>("Photolarin Silinmeyinde Prablem Yarandi");
-            }
+
+                return new SuccessResult();
+                    }
             catch (Exception ex)
             {
 
@@ -688,7 +673,7 @@ namespace DataAccess.Concrete
                     .Include(a => a.ProductSizes)
                     .ThenInclude(a => a.Size)
                     .Include(a => a.User)
-                    .Include(x=>x.Pictures)
+
                     .Include(a => a.ProductCategories)
                     .ThenInclude(a => a.Category)
                     .ThenInclude(a => a.CategoryLanguages)
@@ -747,25 +732,22 @@ namespace DataAccess.Concrete
                 }
 
                 context.SaveChanges();
-                foreach (string url in productUpdateDTO.PicturesUrls)
+                List<string> RemovePhotos= new List<string>();
+                foreach (string url in Product.Pictures)
                 {
-                    if (Product.Pictures.Any(x=>x.url==url))
+                    if (!productUpdateDTO.PicturesUrls.Contains(url))
                     {
-                        continue;
-
+                  RemovePhotos.Add(url);
+                   
                     }
-                    Picture picture = new Picture()
-                    {
-                        ProductId = productUpdateDTO.Id,
-                        url = url
-                    };
-                    context.Pictures.Add(picture);
+          
                 }
-                context.SaveChanges();
+                FileHelper.RemoveFileRange(RemovePhotos);
+               
                 Product.Price = productUpdateDTO.Price;
                 Product.DisCount = productUpdateDTO.DisCount;
                 Product.ProductCode = productUpdateDTO.ProductCode;
-                //Product.Pictures = productUpdateDTO.PicturesUrls;
+                Product.Pictures = productUpdateDTO.PicturesUrls;
                 Product.Color = productUpdateDTO.Color;
                 Product.UpdatedDate = DateTime.Now;
                 Product.UpdatedUserId = productUpdateDTO.UpdatedUserId;
@@ -850,7 +832,7 @@ namespace DataAccess.Concrete
                             Color = item.Product.Color,
                             DisCount = item.Product.DisCount,
                             Price = item.Product.Price,
-                            PicturesUrls = item.Product.Pictures.Select(x => x.url).ToList(),
+                            PicturesUrls = item.Product.Pictures,
                             ProductCode = item.Product.productLanguages.FirstOrDefault()?.Product.ProductCode,
                             ProductDescription = item.Product.productLanguages.FirstOrDefault()?.Description,
                             ProductName = item.Product.productLanguages.FirstOrDefault()?.ProductName,

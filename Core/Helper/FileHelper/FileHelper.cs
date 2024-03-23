@@ -8,6 +8,7 @@ namespace Core.Helper.FileHelper
 {
     public static class FileHelper
     {
+        
         public static async Task<string> SaveFileAsync(this IFormFile file, string WebRootPath)
         {
             string filePath = Path.Combine(wwwrootGetPath.GetwwwrootPath, "uploads");

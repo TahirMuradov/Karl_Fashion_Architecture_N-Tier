@@ -17,7 +17,7 @@ namespace Entities
 
         public List<ProductSize> ProductSizes { get; set; }
         public string Color { get; set; }
-        public List<Picture>? Pictures{ get; set; }
+        public List<string> Pictures{ get; set; }
         public List<ProductLanguages> productLanguages { get; set; }
 
     }

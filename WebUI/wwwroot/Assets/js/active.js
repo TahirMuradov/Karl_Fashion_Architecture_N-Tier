@@ -686,7 +686,23 @@ function ProductModal(id) {
 
     var size = document.querySelectorAll(`#sizeSelected_${id}`)
     var sizeArry = [];
+    var input = document.querySelectorAll(".qty-text")
+    var a_onclick = document.querySelectorAll(".widget-desc ul li a.a_onclikc")
+    if (a_onclick) {
+        a_onclick.forEach((item) => {
+            item.classList.remove("a_onclikc")
+            // item.removeAttribute("data-filter")
+        })
+    }
 
+    input.forEach((tag) => {
+
+        if (!tag.classList.contains("d-none")) {
+            tag.classList.toggle("d-none")
+
+        }
+
+    })
     size.forEach((tag) => {
         if (tag.getAttribute("data-value") != null && tag.getAttribute("size-count") != 0) {
 
