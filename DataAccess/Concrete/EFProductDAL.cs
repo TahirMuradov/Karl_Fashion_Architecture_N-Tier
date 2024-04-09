@@ -371,7 +371,7 @@ namespace DataAccess.Concrete
    .Include(a => a.productLanguages.Where(x => x.LangCode == currentCulture))
                    .Include(a => a.ProductSizes)
                     .ThenInclude(a => a.Size)
-                    .Include(x => x.Pictures)
+                    
                     .Include(a => a.User)
                     .Include(a => a.ProductCategories)
                     .ThenInclude(a => a.Category)
@@ -464,6 +464,7 @@ namespace DataAccess.Concrete
                                    ProductCode = products[i].productLanguages.FirstOrDefault(x => x.LangCode == currentCulture).Product.ProductCode,
                                    ProductName = products[i].productLanguages.FirstOrDefault(x => x.LangCode == currentCulture).ProductName,
                                    Product_Category = products[i].ProductCategories.Select(x => x.Category.CategoryLanguages.FirstOrDefault(x => x.LangCode == currentCulture)?.CategoryName).ToList(),
+                                   ProductDescription = products[i].productLanguages.FirstOrDefault(x=>x.LangCode== currentCulture).Description,
                                    Product_Size = products[i].ProductSizes.ToDictionary(x => x.Size.NumberSize, x => x.SizeStockCount)
                                }
                                     );

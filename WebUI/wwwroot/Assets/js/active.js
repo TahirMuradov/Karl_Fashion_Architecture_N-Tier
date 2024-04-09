@@ -394,7 +394,7 @@ function FilterGetdata(category, size, color, minPrice, maxPrice,page) {
                                     <h4 class="product-price">
                                       ${discountHtml}
                                 </h4>
-                                <p>${item.productDescription}</p>
+                                <p>${item.productName}</p>
                                 <!-- Add to Cart -->
                                
                             </div>
@@ -435,7 +435,7 @@ function FilterGetdata(category, size, color, minPrice, maxPrice,page) {
                  ${discountHtml}
 
                                                                 <p>${item.productDescription}</p>
-                                                                <a href="#">View Full Product Details</a>
+                                                                <a href="/ProductDetail/index/${item.productID}">View Full Product Details</a>
                                                             </div>
 
                                                             <!-- Add to Cart Form -->

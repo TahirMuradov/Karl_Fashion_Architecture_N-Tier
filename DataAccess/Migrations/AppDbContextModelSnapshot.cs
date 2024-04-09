@@ -48,7 +48,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("Entities.CategoryLanguage", b =>
@@ -72,7 +72,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("CategoryLanguages");
+                    b.ToTable("CategoryLanguages", (string)null);
                 });
 
             modelBuilder.Entity("Entities.Concrete.Cart", b =>
@@ -102,7 +102,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Carts");
+                    b.ToTable("Carts", (string)null);
                 });
 
             modelBuilder.Entity("Entities.Concrete.CartItem", b =>
@@ -123,7 +123,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("ItemId");
 
-                    b.ToTable("CartItems");
+                    b.ToTable("CartItems", (string)null);
                 });
 
             modelBuilder.Entity("Entities.Concrete.CategoryProduct", b =>
@@ -144,7 +144,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("CategoryProducts");
+                    b.ToTable("CategoryProducts", (string)null);
                 });
 
             modelBuilder.Entity("Entities.Concrete.Item", b =>
@@ -179,7 +179,7 @@ namespace DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SoldProducts");
+                    b.ToTable("SoldProducts", (string)null);
                 });
 
             modelBuilder.Entity("Entities.Concrete.OrderProduct", b =>
@@ -200,7 +200,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("ProductID");
 
-                    b.ToTable("OrderProducts");
+                    b.ToTable("OrderProducts", (string)null);
                 });
 
             modelBuilder.Entity("Entities.Concrete.PaymentMethod", b =>
@@ -214,7 +214,7 @@ namespace DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PaymentMethods");
+                    b.ToTable("PaymentMethods", (string)null);
                 });
 
             modelBuilder.Entity("Entities.Concrete.PaymentMethodLaunge", b =>
@@ -238,7 +238,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("PaymentMehtodId");
 
-                    b.ToTable("PaymentMethodsLaunge");
+                    b.ToTable("PaymentMethodsLaunge", (string)null);
                 });
 
             modelBuilder.Entity("Entities.Concrete.ProductSize", b =>
@@ -262,7 +262,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("SizeId");
 
-                    b.ToTable("ProductSizes");
+                    b.ToTable("ProductSizes", (string)null);
                 });
 
             modelBuilder.Entity("Entities.Concrete.ShippingLaunguage", b =>
@@ -286,7 +286,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("ShippingMethodId");
 
-                    b.ToTable("ShippingLaunguages");
+                    b.ToTable("ShippingLaunguages", (string)null);
                 });
 
             modelBuilder.Entity("Entities.Concrete.ShippingMethods", b =>
@@ -300,7 +300,7 @@ namespace DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ShippingMethods");
+                    b.ToTable("ShippingMethods", (string)null);
                 });
 
             modelBuilder.Entity("Entities.Concrete.Size", b =>
@@ -329,7 +329,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Sizes");
+                    b.ToTable("Sizes", (string)null);
                 });
 
             modelBuilder.Entity("Entities.Concrete.User", b =>
@@ -459,7 +459,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Orders");
+                    b.ToTable("Orders", (string)null);
                 });
 
             modelBuilder.Entity("Entities.Product", b =>
@@ -506,7 +506,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Products");
+                    b.ToTable("Products", (string)null);
                 });
 
             modelBuilder.Entity("Entities.ProductLanguages", b =>
@@ -538,7 +538,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductLanguages");
+                    b.ToTable("ProductLanguages", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
