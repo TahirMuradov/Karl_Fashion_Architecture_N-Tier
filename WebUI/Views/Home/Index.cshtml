@@ -76,23 +76,73 @@
             </div>
         </section>
         <!-- ****** Welcome Slides Area End ****** -->
+@{
+    GetProductUIDTO singleProduct = new GetProductUIDTO();
+    GetProductUIDTO singleProduct2 = new GetProductUIDTO();
 
+    foreach (var item in Model)
+    {
+        if (item.CreatedDate > singleProduct.CreatedDate)
+        {
+            singleProduct.ProductID = item.ProductID;
+            singleProduct.ProductName = item.ProductName;
+            singleProduct.ProductCode = item.ProductCode;
+            singleProduct.ProductDescription = item.ProductDescription;
+            singleProduct.Product_Size = item.Product_Size;
+            singleProduct.Product_Category = item.Product_Category;
+            singleProduct.PicturesUrls = item.PicturesUrls;
+            singleProduct.CreatedDate = item.CreatedDate;
+            singleProduct.Price = item.Price;
+            singleProduct.DisCount = item.DisCount;
+            singleProduct.Color = item.Color;
+        }
+
+        if (item.DisCount > singleProduct2.DisCount)
+        {
+            singleProduct2.ProductID = item.ProductID;
+            singleProduct2.ProductName = item.ProductName;
+            singleProduct2.ProductCode = item.ProductCode;
+            singleProduct2.ProductDescription = item.ProductDescription;
+            singleProduct2.Product_Size = item.Product_Size;
+            singleProduct2.Product_Category = item.Product_Category;
+            singleProduct2.PicturesUrls = item.PicturesUrls;
+            singleProduct2.CreatedDate = item.CreatedDate;
+            singleProduct2.Price = item.Price;
+            singleProduct2.DisCount = item.DisCount;
+            singleProduct2.Color = item.Color;
+        }
+
+    }
+
+    if (singleProduct.ProductName is null )
+    {
+        singleProduct = Model.FirstOrDefault();
+    }
+    if (singleProduct2.ProductName is null)
+    {
+        singleProduct2 = Model[1];
+
+
+    }
+}
         <!-- ****** Top Catagory Area Start ****** -->
         <section class="top_catagory_area d-md-flex clearfix">
             <!-- Single Catagory -->
-            <div class="single_catagory_area d-flex align-items-center bg-img" style="background-image: url(/Assets/img/bg-img/bg-2.jpg);">
+    <div class="single_catagory_area d-flex align-items-center bg-img" style="background-image: url('@singleProduct2.PicturesUrls[0]');">
                 <div class="catagory-content">
-                    <h6>On Accesories</h6>
-                    <h2>Sale 30%</h2>
-                    <a href="#" class="btn karl-btn">SHOP NOW</a>
+            <h6>@singleProduct2.ProductName Məhsulda Böyük Endirim!</h6>
+                    <h2>Endirim
+                @Html.Raw(((singleProduct2.Price-singleProduct2.DisCount) / singleProduct2.Price) * 100)
+                    %</h2>
+            <a asp-controller="productdetail" asp-action="index" asp-route-Id="@singleProduct2.ProductID" class="btn karl-btn">İndi Al</a>
                 </div>
             </div>
             <!-- Single Catagory -->
-            <div class="single_catagory_area d-flex align-items-center bg-img" style="background-image: url(/Assets/img/bg-img/bg-3.jpg);">
+            <div class="single_catagory_area d-flex align-items-center bg-img" style="background-image: url('@singleProduct.PicturesUrls[0]');">
                 <div class="catagory-content">
-                    <h6>in Bags excepting the new collection</h6>
-                    <h2>Designer bags</h2>
-                    <a href="#" class="btn karl-btn">SHOP NOW</a>
+                    <h6>Yeni Məhsul: @singleProduct.ProductName</h6>
+                    <h2>@singleProduct.ProductDescription</h2>
+            <a asp-controller="productdetail" asp-action="index" asp-route-Id="@singleProduct.ProductID" class="btn karl-btn">İndi Al</a>
                 </div>
             </div>
         </section>

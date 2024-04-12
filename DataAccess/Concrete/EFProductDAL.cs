@@ -286,6 +286,7 @@ namespace DataAccess.Concrete
                         ProductID = ProductAdmin[0].ProductId,
                         Color = ProductAdmin[0].Product.Color,
                         DisCount = ProductAdmin[0].Product.DisCount,
+                        CreatedDate= ProductAdmin[0].Product.CreatedDate,
                         Price = ProductAdmin[0].Product.Price,
                         PicturesUrls = ProductAdmin[0].Product.Pictures,
                         ProductCode = ProductAdmin[0].Product.productLanguages.FirstOrDefault().Product.ProductCode,
@@ -340,6 +341,10 @@ namespace DataAccess.Concrete
                     products.Add(
                    new GetProductUIDTO
                    {
+
+                       
+                       CreatedDate = DateTime.Now,
+                       ProductDescription = ProductAdmin[i].productLanguages.FirstOrDefault(x=>x.LangCode==LangCode).Description,
                        ProductID = ProductAdmin[i].Id,
                        Color = ProductAdmin[i].Color,
                        DisCount = ProductAdmin[i].DisCount,
@@ -456,6 +461,7 @@ namespace DataAccess.Concrete
                         result.Add(
                                new GetProductUIDTO
                                {
+                                   CreatedDate = products[i].CreatedDate,
                                    ProductID = products[i].Id,
                                    Color = products[i].Color,
                                    DisCount = products[i].DisCount,
@@ -833,6 +839,7 @@ namespace DataAccess.Concrete
                             Color = item.Product.Color,
                             DisCount = item.Product.DisCount,
                             Price = item.Product.Price,
+                            CreatedDate=item.Product.CreatedDate,
                             PicturesUrls = item.Product.Pictures,
                             ProductCode = item.Product.productLanguages.FirstOrDefault()?.Product.ProductCode,
                             ProductDescription = item.Product.productLanguages.FirstOrDefault()?.Description,

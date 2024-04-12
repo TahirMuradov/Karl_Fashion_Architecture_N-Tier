@@ -16,6 +16,7 @@ namespace Entities.DTOs.ProductDTOs
         public Dictionary<int,int> Product_Size { get; set; }
         public  List<string> Product_Category { get; set; }
         public List<string> PicturesUrls { get; set; }
+        public DateTime CreatedDate { get; set; }
         public decimal Price { get; set; }
         public decimal DisCount { get; set; }
        
