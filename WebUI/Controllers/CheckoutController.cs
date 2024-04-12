@@ -76,6 +76,7 @@ namespace WebUI.Controllers
         [HttpPost]
         public async Task<IActionResult> Index(ShippingMethodAndUserInfoDTO OrderInfo)
         {
+        
             string currentUserId=string.Empty;
             if (User.Identity.IsAuthenticated)
             {
@@ -115,6 +116,11 @@ namespace WebUI.Controllers
             ViewBag.CartItems = cartItems;
             ViewBag.PaymentMethods = _paymentMethodServices.GetAllPaymentMethod(currentCulture).Data;
             var checkedPaymentMethod=_paymentMethodServices.GetPaymentMethod(OrderInfo.PaymentsMethodId, currentCulture).Data;
+            if (!OrderInfo.ConfirmedDataInUser)
+            {
+                ModelState.AddModelError("Error", "Məlumatların duzgunluyunu tesdiq edin!");
+                return View();
+            }
             if (!ModelState.IsValid)
             {
                
@@ -168,7 +174,7 @@ namespace WebUI.Controllers
 
             Response.Cookies.Delete("cart");
 
-            return Redirect("/home/index");
+            return RedirectToAction("/home/index");
         }
     }
 }
