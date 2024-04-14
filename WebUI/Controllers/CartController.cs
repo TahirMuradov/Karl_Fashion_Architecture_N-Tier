@@ -100,19 +100,19 @@ namespace WebUI.Controllers
             Response.Cookies.Append("cart", JsonSerializer.Serialize(CurrentItemCart));
             return RedirectToAction("Index");
         }
-
-        public IActionResult ClearCart()
+        [HttpGet]
+        public async Task< IActionResult> ClearCart()
         {
 
             var cartItems = Request.Cookies["cart"];
             if (cartItems == null)
             {
 
-                return RedirectToAction("index");
+                return BadRequest();
             }
-
+           
             Response.Cookies.Delete("cart");
-            return RedirectToAction("Index");
+            return Ok();
         }
 
 

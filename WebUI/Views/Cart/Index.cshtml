@@ -86,7 +86,7 @@
                         <a href="shop/index" href="shop-grid-left-sidebar.html">Continue shooping</a>
                     </div>
                     <div class="update-checkout w-50 text-right">
-                            <a class="btn-outline-danger" href="/cart/ClearCart">clear cart</a>
+                            <button class="btn btn-outline-danger" onclick="ClearCart()" >clear cart</button>
                             <a class="update-cart-btn" href="#">Update cart</a>
                     </div>
                 </div>
@@ -169,14 +169,14 @@
                                         @{
                                             if(currentShipping is not null)
                                             {
-                                              <span> 
-                                              @currentShipping.Price
-                                              </span>   
+                                                  <span> 
+                                                  @currentShipping.Price
+                                                  </span>   
                                             }
                                            
 
                                    
-                                    @Html.Raw("&#x20BC")}
+                                        @Html.Raw("&#x20BC")}
                                     
                                    </strong></span></li>
                             <li><span><strong>Cəmi</strong></span> <span><strong id="cartTotalPrice">@cartTotal &#x20BC</strong></span></li>
@@ -198,6 +198,18 @@ else
 
 @section scripts {
     <script>
-      
+        function ClearCart() {
+            $.ajax({
+                url: "/cart/ClearCart",
+                type: "Get",              
+          
+                success: function (e) {
+                    window.location.reload();
+                },
+                error: function (e) {
+                    console.log(e)
+                }
+            });
+        }
     </script>
 }

@@ -685,13 +685,19 @@ namespace DataAccess.Concrete
                     .ThenInclude(a => a.Category)
                     .ThenInclude(a => a.CategoryLanguages)
                     .FirstOrDefault(x => x.Id == productUpdateDTO.Id);
-
+                if (productUpdateDTO.ProductName is not null)
+                {
+                    
                 for (var i = 0; i < productUpdateDTO.ProductName.Count; i++)
                 {
                     Product.productLanguages[i].ProductName = productUpdateDTO.ProductName[i];
                     Product.productLanguages[i].Description = productUpdateDTO.ProductDescrption[i];
                 }
                 //List<CategoryProduct> NewcategoryProducts = new List<CategoryProduct>();
+                }
+                if (productUpdateDTO.CategoryId is not null)
+                {
+                    
                 for (var i = 0; i < productUpdateDTO.CategoryId.Count; i++)
                 {
                     if (!Product.ProductCategories.Select(x => x.Category).Select(x => x.Id).ToList().Contains(productUpdateDTO.CategoryId[i]))
@@ -708,8 +714,10 @@ namespace DataAccess.Concrete
 
                 }
                 context.SaveChanges();
-
-                //List<ProductSize> NewSize = new List<ProductSize>();
+                }
+                if (productUpdateDTO.SizesCount is not null)
+                {
+                    
                 for (var i = 0; i < productUpdateDTO.SizesCount.Count; i++)
                 {
 
@@ -739,6 +747,12 @@ namespace DataAccess.Concrete
                 }
 
                 context.SaveChanges();
+                }
+
+                if (productUpdateDTO.PicturesUrls is not null)
+                {
+                    
+                //List<ProductSize> NewSize = new List<ProductSize>();
                 List<string> RemovePhotos= new List<string>();
                 foreach (string url in Product.Pictures)
                 {
@@ -750,14 +764,15 @@ namespace DataAccess.Concrete
           
                 }
                 FileHelper.RemoveFileRange(RemovePhotos);
+                }
                
-                Product.Price = productUpdateDTO.Price;
-                Product.DisCount = productUpdateDTO.DisCount;
-                Product.ProductCode = productUpdateDTO.ProductCode;
-                Product.Pictures = productUpdateDTO.PicturesUrls;
-                Product.Color = productUpdateDTO.Color;
+                Product.Price = productUpdateDTO.Price!=0? productUpdateDTO.Price : Product.Price;
+                Product.DisCount = productUpdateDTO.DisCount != 0 ? productUpdateDTO.DisCount : Product.DisCount;
+                Product.ProductCode = productUpdateDTO.ProductCode is not null ? productUpdateDTO.ProductCode : Product.ProductCode;
+                Product.Pictures = productUpdateDTO.PicturesUrls is not null ? productUpdateDTO.PicturesUrls : Product.Pictures;
+                Product.Color = productUpdateDTO.Color is not null ? productUpdateDTO.Color : Product.Color;
                 Product.UpdatedDate = DateTime.Now;
-                Product.UpdatedUserId = productUpdateDTO.UpdatedUserId;
+                Product.UpdatedUserId = productUpdateDTO.UpdatedUserId is not null ? productUpdateDTO.UpdatedUserId : Product.UpdatedUserId;
                 //Product.ProductCategories = NewcategoryProducts;
                 //Product.ProductSizes = NewSize;
 

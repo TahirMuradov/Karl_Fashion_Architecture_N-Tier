@@ -143,7 +143,7 @@ namespace WebUI.Controllers
 
             var cookieJson = JsonSerializer.Serialize(CurrentItemCart);
             Response.Cookies.Append("cart", cookieJson);
-
+           
 
             return Ok("Mehsul Elave Edildi");
 
