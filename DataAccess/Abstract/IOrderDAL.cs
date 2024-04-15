@@ -1,6 +1,7 @@
 ﻿using Core.DataAccess;
 using Core.Utilities.Results.Abstract;
 using Entities;
+using Entities.DTOs.OrderDTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,9 +13,10 @@ namespace DataAccess.Abstract
     public interface IOrderDAL:IRepositoryBase<Order>
     {
 
-        IResult AddOrder(Order order);
-        IResult DeleteOrder(Order order);
-        IDataResult<Order> GetOrder(string id);
-        IDataResult<List<Order>> GetAllOrder();
+        IResult AddOrder(OrderAddDTO orderAddDTO);
+        IResult DeleteOrder(string OrderId);
+        IResult ChangeOrderStatus(string OrderId);
+        IDataResult<OrderGetDTO> GetOrder(string id);
+        IDataResult<List<OrderGetDTO>> GetAllOrder();
     }
 }

@@ -47,11 +47,7 @@ namespace DataAccess.Concrete.SQLserver
            
             modelBuilder.Entity<IdentityRole>().ToTable("Roles");
 
-            modelBuilder.Entity<Order>()
-                .HasOne(x => x.User)
-                .WithMany(y => y.Orders)
-                .HasForeignKey(x => x.UserId)
-                .OnDelete(deleteBehavior: DeleteBehavior.Restrict);
+           
             modelBuilder.Entity<Product>()
                     .HasOne(x => x.User)
                     .WithMany(y => y.Products)

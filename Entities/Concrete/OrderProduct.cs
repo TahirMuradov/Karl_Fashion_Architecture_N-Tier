@@ -10,9 +10,14 @@ namespace Entities.Concrete
     public class OrderProduct:IEntity
     {
         public Guid Id { get; set; }
+        public DateTime CreatedDate { get; set; }
         public Guid OrderId { get; set; }
         public Order Order { get; set; }
-        public Guid ProductID { get; set; }
-        public Product  Product { get; set; }
+        public Guid ProductId { get; set; }
+        public string ProductName { get; set; }
+        public string ProductCode { get; set; }
+        public string Size { get; set; }
+        public int Count { get; set; }
+        public decimal Amount { get; set; }
     }
 }

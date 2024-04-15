@@ -48,8 +48,27 @@ namespace Core.Helper.FileHelper
             }
             return true;
         }
+        public static bool RemoveFile(string FilePath)
+        {
+            try
+            {
+                string filePath = Path.Combine(wwwrootGetPath.GetwwwrootPath + FilePath);
+                if (File.Exists(filePath))
+                {
+                    File.Delete(filePath);
 
-        public static string SaveOrderPdf(List<GeneratePdfOrderProductDTO> items, ShippingMethodInOrderPdfDTO shippingMethod, PaymentMethodInOrderPdfDTO paymentMethod)
+                }
+                return true;
+            }
+            catch (Exception)
+            {
+
+               return false;
+            }
+      
+        }
+
+        public static List<string> SaveOrderPdf(List<GeneratePdfOrderProductDTO> items, ShippingMethodInOrderPdfDTO shippingMethod, PaymentMethodInOrderPdfDTO paymentMethod)
         {
             decimal totalPrice = 0;
             string tableBody = "";
@@ -151,8 +170,11 @@ namespace Core.Helper.FileHelper
 
             }
             File.Delete(htmlPath);
-
-            return pdfPath;
+            List<string> result = new List<string>();
+            result.Add(pdfPath);
+            result.Add(guid.ToString().Substring(0, 6));
+            result.Add($"/uploads/OrderPDFs/{guid.ToString().Substring(0, 6)}.pdf");
+            return result;
         }
     
 

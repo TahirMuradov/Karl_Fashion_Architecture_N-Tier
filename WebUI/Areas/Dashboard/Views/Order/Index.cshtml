@@ -1,0 +1,190 @@
+﻿@model List<OrderGetDTO>
+
+
+    
+
+
+<table id="example" class="display table-striped table-hover">
+    <thead>
+        <tr>
+            <th scope="col">№</th>
+            <th scope="col">Sifarisci Adı və Soyadı </th>
+            <th scope="col">Ünvan</th>
+            <th scope="col">Əlaqə Telefonu</th>
+            <th scope="col">Email</th>
+            <th scope="col">Ödəniş Üsülu</th>
+            <th scope="col">Çatdirilma Növü</th>
+            <th scope="col">Çek Nömrəsi</th>
+            <th scope="col">Çek Statusu</th>
+            <th scope="col">Elektron Çek</th>           
+            <th scope="col">Actions</th>
+         
+        </tr>
+    </thead>
+    <tbody>
+        @for (int i = 0; i < Model.Count; i++)
+        {
+            int counter = i + 1;
+            <tr scope ="row">
+            <td >@counter</td>
+                <td>@Model[i].FirstName @Model[i].LastName</td>
+                <td>@Model[i].Address</td>
+                <td>@Model[i].PhoneNumber</td>
+                <td>@Model[i].Email</td>
+                <td>
+                    @foreach (var payment in ViewBag.PaymentMethods as List<GetPaymentMethodDTO>)
+                    {
+                        if (payment.Id == Model[i].PaymentMethodId)
+                        {
+                            <p>
+
+                            @payment.Content
+                            </p>
+                            break;
+                        }
+                    }
+
+                </td>
+                <td>
+
+                    @foreach (var shipping in ViewBag.ShippingMethods as List<GetShippingMethodDTO>)
+                    {
+                        if (shipping.Id.ToLower()==Model[i].ShippingMethodId.ToLower())
+                        {
+                          <p>
+
+                          @shipping.Content
+                          </p> 
+                            break;
+                        }
+                    }
+                </td>
+                <td>@Model[i].OrderNubmer</td>
+                <td>
+                    @Model[i].Status
+                </td>
+                <td>
+                    @{
+                        string PdfLink = "https://"+ ViewBag.CurrentDomain+Model[i].OrderPdfUrl;
+                    }
+                    <a class="btn btn-outline-info" target="_blank" rel="noopener noreferrer" href="@PdfLink">Elektron Çek Məzmununa Bax</a>
+                </td>
+               
+                <td>
+                    <button onclick="ShippingStatusChange('@Model[i].OrderId')" class="btn btn-outline-success">
+                        <i class="fa-solid fa-truck-fast"></i>
+                        <button onclick="DeleteOrder('@Model[i].OrderId')" class="btn btn-outline-danger">
+                            <i class="fa-solid fa-trash"></i>
+                        </button></td>
+       
+        </tr>
+        }
+   
+    </tbody>
+    <tfoot>
+    <th scope="col">№</th>
+    <th scope="col">Sifarisci Adı və Soyadı </th>
+    <th scope="col">Ünvan</th>
+    <th scope="col">Əlaqə Telefonu</th>
+    <th scope="col">Email</th>
+    <th scope="col">Ödəniş Üsülu</th>
+    <th scope="col">Çatdirilma Növü</th>
+    <th scope="col">Çek Nömrəsi</th>
+    <th scope="col">Elektron Çek</th>
+    <th scope="col">Actions</th>
+    </tfoot>
+</table>
+@section scripts {
+    <script>
+        new DataTable('#example');
+        function DeleteOrder(id) {
+
+            Swal.fire({
+                title: "Silmək İstədiyinizə əminsinizmi?",
+               
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: `/dashboard/order/delete?id=${id}`,
+                        type: "DELETE",
+
+                        success: function (e) {
+                            Swal.fire({
+                                title: "Çek Silindi!",
+                                
+                                icon: "success"
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.reload();
+
+                                }
+                            });
+
+                        },
+                        error: function (e) {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Oops...",
+                                text: "Errorun Məzmununa Consoldan Baxabilərsiniz "
+                            });
+                            
+                        }
+                    });
+
+                }
+            });
+        }
+   
+        function ShippingStatusChange(id) {
+          
+            Swal.fire({
+                title: "Çek Statusu Dəyişdirilsin?",
+              
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: `/dashboard/order/OrderStatusChange?id=${id}`,
+                        type: "PUT",
+
+                        success: function (e) {
+                            Swal.fire({
+                                title: "Çek Statusu Dəyişdirildi!",
+                               
+                                icon: "success"
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.reload();
+
+                                }
+                            });
+
+                        },
+                        error: function (e) {
+                            console.log(e);
+                           
+                            Swal.fire({
+                                icon: "error",
+                                title: "Oops...",
+                                text: "Error Məzmununa Consoldan Baxabilərsiniz!"
+                            });
+                          
+                        }
+                    });
+
+                }
+            });
+        }         
+                            
+                            
+                                </script>
+}

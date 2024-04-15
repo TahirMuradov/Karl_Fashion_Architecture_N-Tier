@@ -10,8 +10,8 @@ namespace Entities.Concrete.EnumClass
     {
 
 
-        Expected=0,
-        Shipped=1, 
-        Delivered=2
+        Gözlənilir=0,
+        İmtina=1, 
+        Çatdirildı=2
     }
 }

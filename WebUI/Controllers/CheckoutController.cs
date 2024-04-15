@@ -25,8 +25,9 @@ namespace WebUI.Controllers
         private readonly IProductServices _productServices;
         private readonly UserManager<User> _userManager;
         private readonly IEmailHelper _emailHelper;
+        private readonly IOrderServices _orderServices;
 
-        public CheckoutController(UserManager<User> userManager, IHttpContextAccessor contextAccessor, IPaymentMethodServices paymentMethodServices, IShippingMethodsServices shippingMethodsServices, IEmailHelper emailHelper, IProductServices productServices)
+        public CheckoutController(UserManager<User> userManager, IHttpContextAccessor contextAccessor, IPaymentMethodServices paymentMethodServices, IShippingMethodsServices shippingMethodsServices, IEmailHelper emailHelper, IProductServices productServices, IOrderServices orderServices)
         {
             _userManager = userManager;
             _contextAccessor = contextAccessor;
@@ -34,6 +35,7 @@ namespace WebUI.Controllers
             _shippingMethodsServices = shippingMethodsServices;
             _emailHelper = emailHelper;
             _productServices = productServices;
+            _orderServices = orderServices;
         }
         [HttpGet]
         public IActionResult Index()
@@ -172,7 +174,7 @@ namespace WebUI.Controllers
             }));
         
 
-         string pdfPath=   FileHelper.SaveOrderPdf(
+         List<string> pdfInfo=   FileHelper.SaveOrderPdf(
                 productInPDF,
                 new ShippingMethodInOrderPdfDTO
                 {
@@ -188,22 +190,48 @@ namespace WebUI.Controllers
                     Content = checkedPaymentMethod.Content,
                 }
                 );
-            if (pdfPath is not null)
+            _orderServices.AddOrder(new Entities.DTOs.OrderDTOs.OrderAddDTO
+            {
+                FirstName = OrderInfo.FirstName,
+                LastName = OrderInfo.LastName,
+                Address = OrderInfo.Address,
+                Email = OrderInfo.Email,
+                Message = OrderInfo.Message,
+                PaymentMethodId = OrderInfo.PaymentsMethodId,
+                ShippingMethodId = OrderInfo.ShippingMethodId,
+                PhoneNumber = OrderInfo.PhoneNumber,
+                OrderNumber = pdfInfo[1],
+                OrderPDfUrl = pdfInfo[2],
+                OrderProducts= cartItems.Select(x=>new OrderProduct
+                {
+                    Amount=x.Price,
+                    Count=x.Quantity,
+                    ProductCode=x.ProductCode,
+                    ProductName=x.ProductName,
+                    ProductId=Guid.Parse( x.Id),
+                    Size=x.Size,
+                    
+                    
+                }).ToList(),
+
+            });
+            if (pdfInfo is not null)
             {
                 var currentUser=await _userManager.FindByIdAsync(currentUserId);
                 if (currentUser != null)
                 {
 
-              var result=  await _emailHelper.SendEmailPdfAsync(currentUser.Email, currentUser.UserName, pdfPath);
+              var result=  await _emailHelper.SendEmailPdfAsync(currentUser.Email, currentUser.UserName, pdfInfo[0]);
                 }
                 else
                 {
-                 var result=  await _emailHelper.SendEmailPdfAsync(OrderInfo.Email, OrderInfo.FirstName+OrderInfo.LastName, pdfPath);
+                 var result=  await _emailHelper.SendEmailPdfAsync(OrderInfo.Email, OrderInfo.FirstName+OrderInfo.LastName, pdfInfo[0]);
 
                 }
 
             }
             ViewBag.Succes = true;
+
 
             //HttpClient httpClient = new HttpClient();  
             //   var response= await httpClient.GetAsync("https://localhost:7237/cart/ClearCart");
