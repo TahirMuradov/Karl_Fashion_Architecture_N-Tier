@@ -33,6 +33,8 @@ namespace Bussines.DependencyResolver
             services.AddScoped<IPaymentMethodServices, PaymentMethodManager>();
             services.AddScoped<IOrderDAL, EFOrderDAL>();
             services.AddScoped<IOrderServices, OrderManager>();
+            services.AddScoped<IOrderProductDAL, EFOrderProductDAL>();
+            services.AddScoped<IOrderProductService, OrderProductManager>();
             
 
             //services.Configure<IdentityOptions>(opts =>

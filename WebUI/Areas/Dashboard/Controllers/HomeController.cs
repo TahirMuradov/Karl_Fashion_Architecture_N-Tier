@@ -1,4 +1,5 @@
-﻿using Entities.Concrete;
+﻿using Bussines.Abstract;
+using Entities.Concrete;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -9,19 +10,19 @@ namespace WebUI.Areas.Dashboard.Controllers
     [Authorize(Roles = "Admin")]
     public class HomeController : Controller
     {
-        private readonly UserManager<User> _userManager;
+        private readonly IOrderProductService _orderProductService;
 
-        public HomeController(UserManager<User> userManager)
+        public HomeController(IOrderProductService orderProductService)
         {
-            _userManager = userManager;
+            _orderProductService = orderProductService;
         }
 
         public IActionResult Index()
         {
+            var data=_orderProductService.GetAllSoldProducts();
 
 
-
-            return View();
+            return View(data.Data);
         }
     }
 }
