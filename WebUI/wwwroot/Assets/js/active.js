@@ -167,7 +167,9 @@
     }
 
     // :: 10.0 ScrollUp Active Code
-    if ($.fn.scrollUp) {
+
+    if ($.fn.scrollUp)
+    {
         $.scrollUp({
             scrollSpeed: 1000,
             easingType: 'easeInOutQuart',
@@ -503,14 +505,14 @@ function FilterGetdata(category, size, color, minPrice, maxPrice,page) {
 //14.1 Custom js in backend CartDetail
 
 //inspect blocked btn
-$(document).keydown(function (e) {
-    if (e.which === 123) {
+//$(document).keydown(function (e) {
+//    if (e.which === 123) {
 
-        return false;
+//        return false;
 
-    }
+//    }
 
-});
+//});
 //14.2 CartDetail Js
 function updateCart() {
    

@@ -20,7 +20,7 @@ namespace Entities.DTOs.ProductDTOs
         public List<Guid> CategoryId { get; set; }
         public string UserId { get; set; }
         public string Color { get; set; }
-
+        public DateTime ExpareDateDiscount { get; set; }
         public List<string> ProductName { get; set; }
         public List<string> ProductDescrption { get; set; }
         public List<string> LangCode { get; set; }

@@ -141,7 +141,17 @@
         </div>
 
     </div>
+    <span class="text-warning">*Qeyd:Əgər Endrimli Qiymət Yoxdursa Endirimin Bitmə Tarixini Qeyd Etməyin!</span>
     <div class="form-group">
+
+        <div class="col-12 col-md-5">
+
+            <label asp-for="ExpareDateDiscount"></label>
+            <input class="form-control"  type="date"  asp-for="ExpareDateDiscount" />
+            <span asp-validation-for="ExpareDateDiscount" class="text text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group my-3">
         <label for="Photo" ></label>
         <input  type="file" multiple accept="image/*" value="" id="photo" name="Photo" class="form-control-file" />
         

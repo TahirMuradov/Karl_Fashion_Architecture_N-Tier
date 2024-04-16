@@ -13,6 +13,7 @@ namespace Entities.DTOs.ProductDTOs
         public List<int> ProductSizes { get; set; }
         public List<int> SizesCount { get; set; }
         public string ProductCode { get; set; }
+        public DateTime  ExpareDateDiscount { get; set; }
         public bool isFeatured { get; set; }
         public decimal Price { get; set; }
         public decimal DisCount { get; set; }

@@ -19,7 +19,7 @@ namespace Entities.DTOs.ProductDTOs
         public DateTime CreatedDate { get; set; }
         public decimal Price { get; set; }
         public decimal DisCount { get; set; }
-       
+        public DateTime ExpareDateDisCount { get; set; }
         public string Color { get; set; }   
 
 

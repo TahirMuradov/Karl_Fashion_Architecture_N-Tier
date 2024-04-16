@@ -1,4 +1,4 @@
-﻿@using Bussines.Abstract
+﻿
 @{
     ViewData["Title"] = "Istanbul-Shoes Ecommerce | Home";
 }
@@ -29,50 +29,33 @@
         <!-- ****** Welcome Slides Area Start ****** -->
         <section class="welcome_area">
             <div class="welcome_slides owl-carousel">
-                <!-- Single Slide Start -->
-                <div class="single_slide height-800 bg-img background-overlay" style="background-image: url(/Assets/img/bg-img/bg-1.jpg);">
-                    <div class="container h-100">
-                        <div class="row h-100 align-items-center">
-                            <div class="col-12">
-                                <div class="welcome_slide_text">
-                                    <h6 data-animation="bounceInDown" data-delay="0" data-duration="500ms">* Only today we offer free shipping</h6>
-                                    <h2 data-animation="fadeInUp" data-delay="500ms" data-duration="500ms">Fashion Trends</h2>
-                                    <a href="#" class="btn karl-btn" data-animation="fadeInUp" data-delay="1s" data-duration="500ms">Shop Now</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                @foreach (var item in Model)
+        {
+            if (item.DisCount>0)
+            {
+                decimal discount = item.Price - item.DisCount;
 
                 <!-- Single Slide Start -->
-                <div class="single_slide height-800 bg-img background-overlay" style="background-image: url(/Assets/img/bg-img/bg-4.jpg);">
+                <div class="single_slide height-800 bg-img background-overlay" style="background-image: url(@item.PicturesUrls[0]);">
                     <div class="container h-100">
                         <div class="row h-100 align-items-center">
                             <div class="col-12">
                                 <div class="welcome_slide_text">
-                                    <h6 data-animation="fadeInDown" data-delay="0" data-duration="500ms">* Only today we offer free shipping</h6>
-                                    <h2 data-animation="fadeInUp" data-delay="500ms" data-duration="500ms">Summer Collection</h2>
-                                    <a href="#" class="btn karl-btn" data-animation="fadeInLeftBig" data-delay="1s" data-duration="500ms">Check Collection</a>
+                                    <h6 data-animation="bounceInDown" data-delay="0" data-duration="500ms">* Endirim İlə @discount &#x20BC </h6>
+                                    <h2 data-animation="fadeInUp" data-delay="500ms" data-duration="500ms">@item.ProductName</h2>
+                                    <a asp-controller="productdetail" asp-action="index" asp-route-id="@item.ProductID" class="btn karl-btn" data-animation="fadeInUp" data-delay="1s" data-duration="500ms">Indi Al</a>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+            }
+            
+        }
 
-                <!-- Single Slide Start -->
-                <div class="single_slide height-800 bg-img background-overlay" style="background-image: url(/Assets/img/bg-img/bg-2.jpg);">
-                    <div class="container h-100">
-                        <div class="row h-100 align-items-center">
-                            <div class="col-12">
-                                <div class="welcome_slide_text">
-                                    <h6 data-animation="fadeInDown" data-delay="0" data-duration="500ms">* Only today we offer free shipping</h6>
-                                    <h2 data-animation="bounceInDown" data-delay="500ms" data-duration="500ms">Women Fashion</h2>
-                                    <a href="#" class="btn karl-btn" data-animation="fadeInRightBig" data-delay="1s" data-duration="500ms">Check Collection</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+           
+
+         
             </div>
         </section>
         <!-- ****** Welcome Slides Area End ****** -->
@@ -85,6 +68,7 @@
         if (item.CreatedDate > singleProduct.CreatedDate)
         {
             singleProduct.ProductID = item.ProductID;
+            singleProduct.ExpareDateDisCount = item.ExpareDateDisCount;
             singleProduct.ProductName = item.ProductName;
             singleProduct.ProductCode = item.ProductCode;
             singleProduct.ProductDescription = item.ProductDescription;
@@ -96,8 +80,27 @@
             singleProduct.DisCount = item.DisCount;
             singleProduct.Color = item.Color;
         }
+        if (item.DisCount==0||item.ExpareDateDisCount<DateTime.Now)
+        {
+            continue;
+        }
+        if (singleProduct2.Price==0)
+        {
+            singleProduct2.ProductID = item.ProductID;
+            singleProduct2.ProductName = item.ProductName;
+            singleProduct2.ProductCode = item.ProductCode;
+            singleProduct2.ProductDescription = item.ProductDescription;
+            singleProduct2.Product_Size = item.Product_Size;
+            singleProduct2.Product_Category = item.Product_Category;
+            singleProduct2.PicturesUrls = item.PicturesUrls;
+            singleProduct2.CreatedDate = item.CreatedDate;
+            singleProduct2.Price = item.Price;
+            singleProduct2.DisCount = item.DisCount;
+            singleProduct2.Color = item.Color;
 
-        if (item.DisCount > singleProduct2.DisCount)
+        }
+    
+        if (100-((item.Price - item.DisCount) / item.Price) * 100 >100- ((singleProduct2.Price - singleProduct2.DisCount) / singleProduct2.Price) * 100)
         {
             singleProduct2.ProductID = item.ProductID;
             singleProduct2.ProductName = item.ProductName;
@@ -132,7 +135,7 @@
                 <div class="catagory-content">
             <h6>@singleProduct2.ProductName Məhsulda Böyük Endirim!</h6>
                     <h2>Endirim
-                @Html.Raw(((singleProduct2.Price-singleProduct2.DisCount) / singleProduct2.Price) * 100)
+                @Html.Raw(100-((singleProduct2.Price-singleProduct2.DisCount) / singleProduct2.Price) * 100)
                     %</h2>
             <a asp-controller="productdetail" asp-action="index" asp-route-Id="@singleProduct2.ProductID" class="btn karl-btn">İndi Al</a>
                 </div>
@@ -328,19 +331,48 @@
             </div>
         </section>
         <!-- ****** New Arrivals Area End ****** -->
+@{
+    GetProductUIDTO getProductUIDTO = new GetProductUIDTO();
+    getProductUIDTO = Model.First();
+    foreach (var item in Model)
+    {
+        if (item.DisCount != 0  && getProductUIDTO.ExpareDateDisCount>item.ExpareDateDisCount ) 
+        {
+            getProductUIDTO.ProductID = item.ProductID;
+            getProductUIDTO.ExpareDateDisCount = item.ExpareDateDisCount;
+            getProductUIDTO.ProductName = item.ProductName;
+            getProductUIDTO.ProductCode = item.ProductCode;
+            getProductUIDTO.ProductDescription = item.ProductDescription;
+            getProductUIDTO.Product_Size = item.Product_Size;
+            getProductUIDTO.Product_Category = item.Product_Category;
+            getProductUIDTO.PicturesUrls = item.PicturesUrls;
+            getProductUIDTO.CreatedDate = item.CreatedDate;
+            getProductUIDTO.Price = item.Price;
+            getProductUIDTO.DisCount = item.DisCount;
+            getProductUIDTO.Color = item.Color;
+        }
+
+
+    }
+
+
+
+    decimal disCount = getProductUIDTO.Price - getProductUIDTO.DisCount;
+
+  }
 
         <!-- ****** Offer Area Start ****** -->
-        <section class="offer_area height-700 section_padding_100 bg-img" style="background-image: url(/Assets/img/bg-img/bg-5.jpg);">
+<section class="offer_area height-700 section_padding_100 bg-img" style="background-image: url('@getProductUIDTO.PicturesUrls[0]');">
             <div class="container h-100">
                 <div class="row h-100 align-items-end justify-content-end">
                     <div class="col-12 col-md-8 col-lg-6">
                         <div class="offer-content-area wow fadeInUp" data-wow-delay="1s">
-                            <h2>White t-shirt <span class="karl-level">Hot</span></h2>
-                            <p>* Free shipping until 25 Dec 2017</p>
+                    <h2>@getProductUIDTO.ProductName <span class="karl-level">ŞOK ENDİRİM</span></h2>
+                    <p>* Endirimin Bitmə Tarixi @getProductUIDTO.ExpareDateDisCount.ToString("dd MMM yyyy", new CultureInfo("az-AZ"))</p>
                             <div class="offer-product-price">
-                                <h3><span class="regular-price">&#x20BC25.90</span> &#x20BC 15.90</h3>
+                        <h3><span class="regular-price"> &#x20BC @getProductUIDTO.Price</span> &#x20BC @disCount</h3>
                             </div>
-                            <a href="#" class="btn karl-btn mt-30">Shop Now</a>
+                    <a asp-controller="productdetail" asp-action="index" asp-route-id="@getProductUIDTO.ProductID" class="btn karl-btn mt-30">Indi Al</a>
                         </div>
                     </div>
                 </div>
@@ -348,73 +380,7 @@
         </section>
         <!-- ****** Offer Area End ****** -->
 
-        <!-- ****** Popular Brands Area Start ****** -->
-        <section class="karl-testimonials-area section_padding_100">
-            <div class="container">
-                <div class="row">
-                    <div class="col-12">
-                        <div class="section_heading text-center">
-                            <h2>Testimonials</h2>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row justify-content-center">
-                    <div class="col-12 col-md-8">
-                        <div class="karl-testimonials-slides owl-carousel">
-
-                            <!-- Single Testimonial Area -->
-                            <div class="single-testimonial-area text-center">
-                                <span class="quote">"</span>
-                                <h6>Nunc pulvinar molestie sem id blandit. Nunc venenatis interdum mollis. Aliquam finibus nulla quam, a iaculis justo finibus non. Suspendisse in fermentum nunc.Nunc pulvinar molestie sem id blandit. Nunc venenatis interdum mollis. </h6>
-                                <div class="testimonial-info d-flex align-items-center justify-content-center">
-                                    <div class="tes-thumbnail">
-                                        <img src="~/Assets/img/bg-img/tes-1.jpg" alt="">
-                                    </div>
-                                    <div class="testi-data">
-                                        <p>Michelle Williams</p>
-                                        <span>Client, Los Angeles</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Single Testimonial Area -->
-                            <div class="single-testimonial-area text-center">
-                                <span class="quote">"</span>
-                                <h6>Nunc pulvinar molestie sem id blandit. Nunc venenatis interdum mollis. Aliquam finibus nulla quam, a iaculis justo finibus non. Suspendisse in fermentum nunc.Nunc pulvinar molestie sem id blandit. Nunc venenatis interdum mollis. </h6>
-                                <div class="testimonial-info d-flex align-items-center justify-content-center">
-                                    <div class="tes-thumbnail">
-                                        <img src="~/Assets/img/bg-img/tes-1.jpg" alt="">
-                                    </div>
-                                    <div class="testi-data">
-                                        <p>Michelle Williams</p>
-                                        <span>Client, Los Angeles</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Single Testimonial Area -->
-                            <div class="single-testimonial-area text-center">
-                                <span class="quote">"</span>
-                                <h6>Nunc pulvinar molestie sem id blandit. Nunc venenatis interdum mollis. Aliquam finibus nulla quam, a iaculis justo finibus non. Suspendisse in fermentum nunc.Nunc pulvinar molestie sem id blandit. Nunc venenatis interdum mollis. </h6>
-                                <div class="testimonial-info d-flex align-items-center justify-content-center">
-                                    <div class="tes-thumbnail">
-                                        <img src="~/Assets/img/bg-img/tes-1.jpg" alt="">
-                                    </div>
-                                    <div class="testi-data">
-                                        <p>Michelle Williams</p>
-                                        <span>Client, Los Angeles</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </section>
-        <!-- ****** Popular Brands Area End ****** -->
+    
    
         @section scripts{
 

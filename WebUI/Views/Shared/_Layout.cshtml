@@ -24,7 +24,7 @@
 </head>
 
 <body>
-    <div class="catagories-side-menu">
+    <div class="catagories-side-menu d-none">
         <!-- Close Icon -->
         <div id="sideMenuClose">
             <i class="ti-close"></i>
@@ -105,8 +105,8 @@
                         <div class="col-12 col-lg-6 h-100" >
                             <div class="top_single_area d-flex align-items-center h-100">
                                 <!-- Logo Area -->
-                                <div class="top_logo h-100">
-                                    <a href="#"><img src="~/Assets/img/core-img/new_logo.png" style="height: 100% !important;"></a>
+                                <div class="top_logo ">
+                                    <a href="#"><img src="~/Assets/img/core-img/logo.png"></a>
                                 </div>
                                 <!-- Cart & Menu Area -->
                                 <div class="header-cart-menu  w-80 d-flex align-items-baseline ml-auto">
@@ -131,7 +131,7 @@
                         </div>
                         <div class="col-12 col-lg-6">
                             <div class="header-right-side-menu ml-15 d-flex align-items-center justify-content-around ">
-                                <a href="#" class="" id="sideMenuBtn"><i class="ti-menu " aria-hidden="true"></i></a>
+                                <a href="#" class="d-none" id="sideMenuBtn"><i class="ti-menu" aria-hidden="true"></i></a>
 
                                 @if (User.Identity.IsAuthenticated)
                                 {
@@ -169,7 +169,7 @@
 
                                 <div class="dropdown show ms-1" style="">
                                     <a class="btn btn-secondary dropdown-toggle" style="background-color:#FF084E;" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        Select Launguage
+                                        <i class="fa-solid fa-globe"></i>
                                     </a>
 
                                     <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
@@ -214,10 +214,10 @@
                         <div class="col-12 d-md-flex justify-content-between">
                             <!-- Header Social Area -->
                             <div class="header-social-area">
-                                <a href="#"><span class="karl-level">Share</span> <i class="fa fa-pinterest" aria-hidden="true"></i></a>
-                                <a href="#"><i class="fa fa-facebook" aria-hidden="true"></i></a>
-                                <a href="#"><i class="fa fa-twitter" aria-hidden="true"></i></a>
-                                <a href="#"><i class="fa fa-linkedin" aria-hidden="true"></i></a>
+                                <a href="#"><span class="karl-level">Share</span> <i class="fa-brands fa-instagram"></i></a>
+                                <a href="#"><i class="fa-brands fa-whatsapp"></i></a>
+                                <a href="#"><i class="fa-brands fa-facebook"></i></a>
+                       
                             </div>
                             <!-- Menu Area -->
                             <div class="main-menu-area">
@@ -257,7 +257,7 @@
                     <div class="col-12 col-md-6 col-lg-3">
                         <div class="single_footer_area">
                             <div class="footer-logo">
-                                <img src="~/Assets/img/core-img/new_logo.png" alt="">
+                                <img src="~/Assets/img/core-img/logo.png" alt="">
                             </div>
                             <div class="copywrite_text d-flex align-items-center">
                                 <p>
@@ -313,10 +313,9 @@
                     <div class="row">
                         <div class="col-12">
                             <div class="footer_social_area text-center">
-                                <a href="#"><i class="fa fa-pinterest" aria-hidden="true"></i></a>
-                                <a href="#"><i class="fa fa-facebook" aria-hidden="true"></i></a>
-                                <a href="#"><i class="fa fa-twitter" aria-hidden="true"></i></a>
-                                <a href="#"><i class="fa fa-linkedin" aria-hidden="true"></i></a>
+                                <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                                <a href="#"><i class="fa-brands fa-whatsapp"></i></a>
+                                <a href="#"><i class="fa-brands fa-facebook"></i></a>
                             </div>
                         </div>
                     </div>

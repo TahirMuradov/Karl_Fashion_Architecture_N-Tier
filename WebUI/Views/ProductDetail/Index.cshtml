@@ -93,18 +93,21 @@
                                 @Model.Price &#x20BC
                             </span>
                         </h4>
-                        }
-                        else
-                        {
-                            <span>
-                                <del>
+                    }
+                    else
+                    {
+                        decimal discount = Model.Price - Model.DisCount;
+                        <span>
+                            <del>
 
 
-                                @Model.DisCount&#x20BC
+                                @Model.Price &#x20BC
                             </del>
                          
                                 </span>
-                        <span class="font-weight-bold">@Model.Price  &#x20BC</span>
+                        <span class="font-weight-bold">
+                            @discount  &#x20BC
+                        </span>
 
                     }
                     

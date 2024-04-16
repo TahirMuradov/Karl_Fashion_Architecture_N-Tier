@@ -41,7 +41,7 @@ namespace DataAccess.Concrete
                     DisCount = 0,
                     CreatedDate = DateTime.Now,
                     Color = ProductAddDTO.Color,
-                   
+                   ExpareDateDiscount=ProductAddDTO.ExpareDateDiscount,
                     UserId = ProductAddDTO.UserId,
                     isFeatured = ProductAddDTO.isFeatured
 
@@ -170,10 +170,12 @@ namespace DataAccess.Concrete
                 var resultMap = result.Select(x => new ProductGetAdminListDTO
                 {
                     DisCount = x.DisCount,
+                    ExpareDateDiscount=x.DisCount==0?default: x.ExpareDateDiscount,
                     ProductPrice = x.Price,
                     ProductCode = x.ProductCode,
                     ImgUrls = x.Pictures,
                     ProductId = x.Id.ToString(),
+
                     categoryName = x.ProductCategories
          .Where(pc => pc.Category.CategoryLanguages.Any(cl => cl.LangCode == "az"))
          .Select(pc => pc.Category.CategoryLanguages.First(cl => cl.LangCode == "az").CategoryName)
@@ -286,6 +288,7 @@ namespace DataAccess.Concrete
                         ProductID = ProductAdmin[0].ProductId,
                         Color = ProductAdmin[0].Product.Color,
                         DisCount = ProductAdmin[0].Product.DisCount,
+                        ExpareDateDisCount = ProductAdmin[0].Product.DisCount == 0 ? default : ProductAdmin[0].Product.ExpareDateDiscount,
                         CreatedDate= ProductAdmin[0].Product.CreatedDate,
                         Price = ProductAdmin[0].Product.Price,
                         PicturesUrls = ProductAdmin[0].Product.Pictures,
@@ -345,6 +348,7 @@ namespace DataAccess.Concrete
                        
                        CreatedDate = DateTime.Now,
                        ProductDescription = ProductAdmin[i].productLanguages.FirstOrDefault(x=>x.LangCode==LangCode).Description,
+                       ExpareDateDisCount = ProductAdmin[i].DisCount == 0 ? default : ProductAdmin[i].ExpareDateDiscount,
                        ProductID = ProductAdmin[i].Id,
                        Color = ProductAdmin[i].Color,
                        DisCount = ProductAdmin[i].DisCount,
@@ -463,6 +467,7 @@ namespace DataAccess.Concrete
                                {
                                    CreatedDate = products[i].CreatedDate,
                                    ProductID = products[i].Id,
+                                   ExpareDateDisCount = products[i].DisCount == 0 ? default : products[i].ExpareDateDiscount,
                                    Color = products[i].Color,
                                    DisCount = products[i].DisCount,
                                    Price = products[i].Price,
@@ -768,6 +773,7 @@ namespace DataAccess.Concrete
                
                 Product.Price = productUpdateDTO.Price!=0? productUpdateDTO.Price : Product.Price;
                 Product.DisCount = productUpdateDTO.DisCount != 0 ? productUpdateDTO.DisCount : Product.DisCount;
+                Product.ExpareDateDiscount = productUpdateDTO.ExpareDateDiscount;
                 Product.ProductCode = productUpdateDTO.ProductCode is not null ? productUpdateDTO.ProductCode : Product.ProductCode;
                 Product.Pictures = productUpdateDTO.PicturesUrls is not null ? productUpdateDTO.PicturesUrls : Product.Pictures;
                 Product.Color = productUpdateDTO.Color is not null ? productUpdateDTO.Color : Product.Color;
@@ -853,6 +859,7 @@ namespace DataAccess.Concrete
                             ProductID = item.ProductId,
                             Color = item.Product.Color,
                             DisCount = item.Product.DisCount,
+                            ExpareDateDisCount =item.Product.DisCount == 0 ? default : item.Product.ExpareDateDiscount,
                             Price = item.Product.Price,
                             CreatedDate=item.Product.CreatedDate,
                             PicturesUrls = item.Product.Pictures,

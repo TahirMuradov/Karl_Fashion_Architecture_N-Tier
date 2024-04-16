@@ -15,7 +15,7 @@ namespace Entities.DTOs.ProductDTOs
         public decimal ProductPrice { get; set; }
         public decimal DisCount { get; set; }
         public  List<string> categoryName { get; set; }
-
+        public DateTime ExpareDateDiscount { get; set; }
 
         public override bool Equals(object obj)
         {

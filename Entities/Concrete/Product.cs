@@ -9,6 +9,7 @@ namespace Entities
         public string ProductCode { get; set; }
 
         public decimal DisCount { get; set; }
+        public DateTime ExpareDateDiscount { get; set; }
         public decimal Price { get; set; }
         public bool isFeatured { get; set; }
 
