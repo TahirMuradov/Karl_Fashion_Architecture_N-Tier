@@ -123,7 +123,7 @@
                             <!-- Product Description -->
                             <div class="product-description">
                                     <h4 class="product-price">
-                                        @if (item.DisCount > 0)
+                                        @if (item.DisCount > 0 &&item.ExpareDateDisCount>DateTime.Now)
                                         {
                                             decimal disCount = item.Price - item.DisCount;
                                            
@@ -178,7 +178,7 @@
                                                                     <i class="fa fa-star" aria-hidden="true"></i>
                                                                 </div>
 
-                                                                @if (item.DisCount > 0)
+                                                                @if (item.DisCount > 0 && item.ExpareDateDisCount>DateTime.Now)
                                                                 {
                                                                     decimal disCount = item.Price-item.DisCount;
                                                                     <h5 class="price">

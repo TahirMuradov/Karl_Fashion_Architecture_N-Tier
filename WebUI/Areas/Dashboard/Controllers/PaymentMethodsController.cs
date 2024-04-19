@@ -28,11 +28,11 @@ namespace WebUI.Areas.Dashboard.Controllers
         {
             if (id is  null )
             {
-            return RedirectToAction("Index");
+             return   RedirectToAction("Index");
 
             }
             var result= _paymentMethodServices.DeletePaymentMethod(id);
-            return RedirectToAction("Index");
+            return  RedirectToAction("Index");
         }
         public IActionResult Create()
         {

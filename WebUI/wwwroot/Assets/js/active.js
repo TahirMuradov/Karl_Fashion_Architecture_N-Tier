@@ -368,19 +368,22 @@ function FilterGetdata(category, size, color, minPrice, maxPrice,page) {
 
 
                 }
-            
-                var discountHtml = item.disCount != 0 ? 
+                var now = new Date();
 
+                // Unix epoch tarihini oluştur (1 Ocak 1970 00:00:00)
+                var unixEpoch = new Date(item.expareDateDisCount);
+
+                // Geçerli tarih/saat nesnesini Unix epoch'e göre saniye cinsinden bir zaman damgasına dönüştür
+                var unixTimeStamp = (unixEpoch - now) / 1000; // Milisaniyeleri saniyelere çevir
+
+                // Unix zaman damgasını C#'daki Unix zaman damgası ile karşılaştırabilir veya başka bir işlem yapabilirsiniz
+                console.log("Unix zaman damgası:", unixTimeStamp);
+
+                var discountHtml = item.disCount !== 0 && unixTimeStamp > 0 ?
                     `<span>${item.price - item.disCount} &#x20BC</span>
-                    <s>${item.price} &#x20BC </s>`
+    <s>${item.price} &#x20BC </s>`
                     :
-                `
-                      <span>
-
-                        ${item.price} &#x20BC
-                    </span>
-                
-                `
+                    `<span>${item.price} &#x20BC</span>`;
                 var productHtml = `
                 
                 <div class="col-12 col-sm-6 col-lg-4 single_gallery_item  wow fadeInUpBig" data-wow-delay="0.2s">

@@ -434,7 +434,7 @@ namespace DataAccess.Concrete
                             if (j == 3)
 
                             {
-                                if ((products[i].DisCount == 0 ?
+                                if (( products[i].ExpareDateDiscount<DateTime.Now ?
                                   products[i].Price >= decimal.Parse(minPrice) :
                                 products[i].Price-products[i].DisCount >= decimal.Parse(minPrice))
                                 )
@@ -448,7 +448,7 @@ namespace DataAccess.Concrete
 
                             if (j == 4)
                             {
-                                if (products[i].DisCount == 0 ?
+                                if ( products[i].ExpareDateDiscount<DateTime.Now ?
                                   products[i].Price <= decimal.Parse(maxPrice) :
                                 products[i].Price-products[i].DisCount <= decimal.Parse(maxPrice))
                                 {
@@ -470,7 +470,7 @@ namespace DataAccess.Concrete
                                {
                                    CreatedDate = products[i].CreatedDate,
                                    ProductID = products[i].Id,
-                                   ExpareDateDisCount = products[i].DisCount == 0 ? default : products[i].ExpareDateDiscount,
+                                   ExpareDateDisCount = products[i].ExpareDateDiscount,
                                    Color = products[i].Color,
                                    DisCount = products[i].DisCount,
                                    Price = products[i].Price,
@@ -817,7 +817,7 @@ namespace DataAccess.Concrete
             try
             {
                 var context = new AppDbContext();
-                var Prices = context.Products.Select(x => (x.DisCount == 0 ? x.Price :x.Price- x.DisCount)).ToList();
+                var Prices = context.Products.Select(x => ( x.ExpareDateDiscount<DateTime.Now ? x.Price :x.Price- x.DisCount)).ToList();
                 Dictionary<string, decimal> MaxAndMinPrice = new Dictionary<string, decimal>();
                 MaxAndMinPrice.Add("maxPrice", Math.Ceiling(Prices.Max()));
 
