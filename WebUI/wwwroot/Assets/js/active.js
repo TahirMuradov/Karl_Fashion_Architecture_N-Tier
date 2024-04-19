@@ -371,8 +371,8 @@ function FilterGetdata(category, size, color, minPrice, maxPrice,page) {
             
                 var discountHtml = item.disCount != 0 ? 
 
-                    `<span>${item.price} &#x20BC</span>
-                    <s>${item.disCount} &#x20BC </s>`
+                    `<span>${item.price - item.disCount} &#x20BC</span>
+                    <s>${item.price} &#x20BC </s>`
                     :
                 `
                       <span>

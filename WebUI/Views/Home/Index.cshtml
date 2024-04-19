@@ -36,7 +36,7 @@
                 decimal discount = item.Price - item.DisCount;
 
                 <!-- Single Slide Start -->
-                <div class="single_slide height-800 bg-img background-overlay" style="background-image: url(@item.PicturesUrls[0]);">
+                <div class="single_slide height-800 bg-img background-overlay" style="background-image: url('@item.PicturesUrls[0]');">
                     <div class="container h-100">
                         <div class="row h-100 align-items-center">
                             <div class="col-12">
@@ -117,16 +117,7 @@
 
     }
 
-    if (singleProduct.ProductName is null )
-    {
-        singleProduct = Model.FirstOrDefault();
-    }
-    if (singleProduct2.ProductName is null)
-    {
-        singleProduct2 = Model[1];
-
-
-    }
+  
 }
         <!-- ****** Top Catagory Area Start ****** -->
         <section class="top_catagory_area d-md-flex clearfix">
@@ -187,9 +178,9 @@
                                    
                                         @if (item.DisCount>0)
                                             {
-
+                                            decimal disCount2 = item.Price - item.DisCount;
                                             <h5 class="price">
-                                                          @item.DisCount &#x20BC
+                                                @disCount2 &#x20BC
                                                           <span>@item.Price &#x20BC </span>
                                             </h5>
                                         }
@@ -319,7 +310,21 @@
                         </div>
                         <!-- Product Description -->
                         <div class="product-description">
-                        <h4 class="product-price">@product.Price &#x20BC</h4>
+
+                        @if (product.DisCount > 0)
+                        {
+                            decimal disCount2 = product.Price - product.DisCount;
+                            <h5 class="price">
+                                @disCount2 &#x20BC
+                                <s>@product.Price &#x20BC </s>
+                            </h5>
+                        }
+                        else
+                        {
+                            <h5 class="price">
+                                @product.Price &#x20BC
+                            </h5>
+                        }
                             <p>@product.ProductName</p>
                           
                         </div>

@@ -125,12 +125,12 @@
                                     <h4 class="product-price">
                                         @if (item.DisCount > 0)
                                         {
-
+                                            decimal disCount = item.Price - item.DisCount;
                                            
                                             <span>
 
 
-                                            @item.DisCount &#x20BC
+                                            @disCount &#x20BC
                                             </span>  
                                                 <s>@item.Price &#x20BC </s>
                                             
@@ -180,9 +180,9 @@
 
                                                                 @if (item.DisCount > 0)
                                                                 {
-
+                                                                    decimal disCount = item.Price-item.DisCount;
                                                                     <h5 class="price">
-                                                                        @item.DisCount &#x20BC
+                                                                        @disCount &#x20BC
                                                                         <span>@item.Price &#x20BC </span>
                                                                     </h5>
                                                                 }

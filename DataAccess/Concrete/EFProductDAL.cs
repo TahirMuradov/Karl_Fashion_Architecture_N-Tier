@@ -38,7 +38,7 @@ namespace DataAccess.Concrete
                 {
                     ProductCode = ProductAddDTO.ProductCode,
                     Price = ProductAddDTO.Price,
-                    DisCount = 0,
+                    DisCount = ProductAddDTO.DisCount,
                     CreatedDate = DateTime.Now,
                     Color = ProductAddDTO.Color,
                    ExpareDateDiscount=ProductAddDTO.ExpareDateDiscount,
@@ -95,8 +95,11 @@ namespace DataAccess.Concrete
                 };
                 for (int i = 0; i < ProductAddDTO.Sizes.Count; i++)
                 {
+                    if (ProductAddDTO.SizesCount[i]==0)
+                    {
+                        continue;
+                    }
                     Entities.Concrete.Size productSize = context.Sizes.FirstOrDefault(x => x.NumberSize.ToString() == ProductAddDTO.Sizes[i]);
-
                     ProductSize newproductSize = new ProductSize()
                     {
                         ProductId = product.Id,
@@ -433,7 +436,7 @@ namespace DataAccess.Concrete
                             {
                                 if ((products[i].DisCount == 0 ?
                                   products[i].Price >= decimal.Parse(minPrice) :
-                                  products[i].DisCount >= decimal.Parse(minPrice))
+                                products[i].Price-products[i].DisCount >= decimal.Parse(minPrice))
                                 )
                                 {
 
@@ -447,7 +450,7 @@ namespace DataAccess.Concrete
                             {
                                 if (products[i].DisCount == 0 ?
                                   products[i].Price <= decimal.Parse(maxPrice) :
-                                  products[i].DisCount <= decimal.Parse(maxPrice))
+                                products[i].Price-products[i].DisCount <= decimal.Parse(maxPrice))
                                 {
 
                                     a++;
@@ -773,7 +776,7 @@ namespace DataAccess.Concrete
                
                 Product.Price = productUpdateDTO.Price!=0? productUpdateDTO.Price : Product.Price;
                 Product.DisCount = productUpdateDTO.DisCount != 0 ? productUpdateDTO.DisCount : Product.DisCount;
-                Product.ExpareDateDiscount = productUpdateDTO.ExpareDateDiscount;
+                Product.ExpareDateDiscount = productUpdateDTO.ExpareDateDiscount<DateTime.Now?DateTime.Now: productUpdateDTO.ExpareDateDiscount;
                 Product.ProductCode = productUpdateDTO.ProductCode is not null ? productUpdateDTO.ProductCode : Product.ProductCode;
                 Product.Pictures = productUpdateDTO.PicturesUrls is not null ? productUpdateDTO.PicturesUrls : Product.Pictures;
                 Product.Color = productUpdateDTO.Color is not null ? productUpdateDTO.Color : Product.Color;
@@ -814,7 +817,7 @@ namespace DataAccess.Concrete
             try
             {
                 var context = new AppDbContext();
-                var Prices = context.Products.Select(x => (x.DisCount == 0 ? x.Price : x.DisCount)).ToList();
+                var Prices = context.Products.Select(x => (x.DisCount == 0 ? x.Price :x.Price- x.DisCount)).ToList();
                 Dictionary<string, decimal> MaxAndMinPrice = new Dictionary<string, decimal>();
                 MaxAndMinPrice.Add("maxPrice", Math.Ceiling(Prices.Max()));
 

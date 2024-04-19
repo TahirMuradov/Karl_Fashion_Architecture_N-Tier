@@ -90,6 +90,7 @@ public EFSizeDAL(UserManager<User> userManager)
                         context.Sizes.Where(expression).Include(x => x.ProductSize)
                                     .ThenInclude(x => x.Product)
                                     .ThenInclude(x => x.productLanguages)
+                  
                                     .Include(x => x.User).ToList();
 
                 var result = query.Select(x => new SizeGetAdminDetailDTO
@@ -98,7 +99,7 @@ public EFSizeDAL(UserManager<User> userManager)
                     SizeId = x.Id.ToString(),
                     ProductName =x.ProductSize.Select(x=>x.Product.ProductCode).ToList(),
                     Size=x.NumberSize,
-                    StockSizeCount=x.ProductSize.Count,
+                    StockSizeCount=x.ProductSize.Where(y=>y.Size.NumberSize==x.NumberSize).Sum(y=>y.SizeStockCount),
                     CreatorUserName=x.User.UserName
                     
 
