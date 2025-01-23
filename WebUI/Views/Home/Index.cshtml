@@ -103,7 +103,7 @@
             singleProduct2.Color = item.Color;
 
         }
-    
+
         if (100-((item.Price-item.DisCount) / item.Price) * 100 >100- ((singleProduct2.Price- singleProduct2.DisCount) / singleProduct2.Price) * 100)
         {
             singleProduct2.ProductID = item.ProductID;
@@ -121,12 +121,15 @@
 
     }
 
-  
+
 }
-        <!-- ****** Top Catagory Area Start ****** -->
-        <section class="top_catagory_area d-md-flex clearfix">
-            <!-- Single Catagory -->
-    <div class="single_catagory_area d-flex align-items-center bg-img" style="background-image: url('@singleProduct2.PicturesUrls[0]');">
+<!-- ****** Top Catagory Area Start ****** -->
+<section class="top_catagory_area d-md-flex clearfix">
+    <!-- Single Catagory -->
+    @if (singleProduct2.PicturesUrls is not null)
+    {
+        
+     <div class="single_catagory_area d-flex align-items-center bg-img" style="background-image: url('@singleProduct2.PicturesUrls[0]');">
                 <div class="catagory-content">
             <h6>@singleProduct2.ProductName Məhsulda Böyük Endirim!</h6>
                     <h2>Endirim
@@ -134,7 +137,8 @@
                     %</h2>
             <a asp-controller="productdetail" asp-action="index" asp-route-Id="@singleProduct2.ProductID" class="btn karl-btn">İndi Al</a>
                 </div>
-            </div>
+            </div> 
+    }
             <!-- Single Catagory -->
             <div class="single_catagory_area d-flex align-items-center bg-img" style="background-image: url('@singleProduct.PicturesUrls[0]');">
                 <div class="catagory-content">
